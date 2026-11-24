@@ -1,0 +1,12 @@
+@* Ported from registry/ui/spinner.tsx. *@
+<span class="@Classes" role="status" aria-label="@(string.IsNullOrEmpty(Label) ? "در حال بارگذاری" : Label)">
+    <span class="sr-only">@(string.IsNullOrEmpty(Label) ? "در حال بارگذاری" : Label)</span>
+</span>
+
+@code {
+    [Parameter] public string Size { get; set; } = "md";
+    [Parameter] public string? Label { get; set; }
+    [Parameter] public string? Class { get; set; }
+
+    private string Classes => Css.Join("vf-spinner", Size is "sm" or "lg" ? $"vf-spinner--{Size}" : null, Class);
+}

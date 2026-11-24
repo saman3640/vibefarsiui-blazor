@@ -1,0 +1,34 @@
+@* Ported from registry/ui/rating.tsx. *@
+<div class="vf-rating @Class" role="group" aria-label="@($"امتیاز از {PersianText.Fa(Max)}")">
+    @for (var i = 1; i <= Max; i++)
+    {
+        var score = i;
+        <button type="button"
+                data-filled="@(score <= Value ? "true" : "false")"
+                aria-label="@($"{PersianText.Fa(score)} ستاره")"
+                aria-pressed="@(score <= Value ? "true" : "false")"
+                disabled="@ReadOnly"
+                @onclick="() => SetAsync(score)">
+            <LucideIcon Name="star" Size="18" />
+        </button>
+    }
+    @if (ShowValue)
+    {
+        <span class="vf-rating__value">@PersianText.Fa(Value) از @PersianText.Fa(Max)</span>
+    }
+</div>
+
+@code {
+    [Parameter] public int Value { get; set; }
+    [Parameter] public EventCallback<int> ValueChanged { get; set; }
+    [Parameter] public int Max { get; set; } = 5;
+    [Parameter] public bool ReadOnly { get; set; }
+    [Parameter] public bool ShowValue { get; set; }
+    [Parameter] public string? Class { get; set; }
+
+    private async Task SetAsync(int score)
+    {
+        Value = score;
+        await ValueChanged.InvokeAsync(score);
+    }
+}

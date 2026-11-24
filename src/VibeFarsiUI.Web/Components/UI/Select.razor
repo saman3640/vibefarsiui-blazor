@@ -1,0 +1,51 @@
+@* Ported from registry/ui/select.tsx. Native select keeps keyboard and mobile behaviour. *@
+<div class="vf-field">
+    @if (!string.IsNullOrEmpty(Label))
+    {
+        <label class="vf-label" for="@Id">@Label</label>
+    }
+    <select id="@Id"
+            class="vf-select @Class"
+            value="@Value"
+            disabled="@Disabled"
+            aria-invalid="@(!string.IsNullOrEmpty(Error) ? "true" : null)"
+            @onchange="OnChangeAsync"
+            @attributes="AdditionalAttributes">
+        @if (!string.IsNullOrEmpty(Placeholder))
+        {
+            <option value="">@Placeholder</option>
+        }
+        @foreach (var option in Options)
+        {
+            <option value="@option.Value" disabled="@option.Disabled" selected="@(option.Value == Value)">@option.Label</option>
+        }
+    </select>
+    @if (!string.IsNullOrEmpty(Error))
+    {
+        <span class="vf-error" role="alert">@Error</span>
+    }
+    else if (!string.IsNullOrEmpty(Hint))
+    {
+        <span class="vf-hint">@Hint</span>
+    }
+</div>
+
+@code {
+    [Parameter] public string? Value { get; set; }
+    [Parameter] public EventCallback<string?> ValueChanged { get; set; }
+    [Parameter] public IReadOnlyList<SelectOption> Options { get; set; } = [];
+    [Parameter] public string? Id { get; set; } = $"vf-select-{Guid.NewGuid():N}";
+    [Parameter] public string? Label { get; set; }
+    [Parameter] public string? Placeholder { get; set; }
+    [Parameter] public string? Hint { get; set; }
+    [Parameter] public string? Error { get; set; }
+    [Parameter] public bool Disabled { get; set; }
+    [Parameter] public string? Class { get; set; }
+    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private async Task OnChangeAsync(ChangeEventArgs args)
+    {
+        Value = args.Value?.ToString();
+        await ValueChanged.InvokeAsync(Value);
+    }
+}

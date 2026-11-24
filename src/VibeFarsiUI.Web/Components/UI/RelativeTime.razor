@@ -1,0 +1,22 @@
+@* Ported from registry/ui/relative-time.tsx. *@
+<time datetime="@Value.ToString("O")" title="@JalaliCalendar.Format(Value, weekday: true)">@Text</time>
+
+@code {
+    [Parameter] public DateTime Value { get; set; }
+    [Parameter] public DateTime? Now { get; set; }
+
+    private string Text
+    {
+        get
+        {
+            var now = Now ?? DateTime.Now;
+            var delta = now - Value;
+            if (delta.TotalSeconds < 60) return "همین حالا";
+            if (delta.TotalMinutes < 60) return $"{PersianText.Fa((int)delta.TotalMinutes)} دقیقه پیش";
+            if (delta.TotalHours < 24) return $"{PersianText.Fa((int)delta.TotalHours)} ساعت پیش";
+            if (delta.TotalDays < 2) return "دیروز";
+            if (delta.TotalDays < 30) return $"{PersianText.Fa((int)delta.TotalDays)} روز پیش";
+            return JalaliCalendar.Format(Value, weekday: false);
+        }
+    }
+}

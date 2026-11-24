@@ -1,0 +1,40 @@
+@* Ported from registry/ui/pagination.tsx. *@
+<nav class="vf-pager @Class" aria-label="صفحه‌بندی">
+    <button type="button" disabled="@(Page <= 1)" aria-label="صفحه قبل" @onclick="() => GoAsync(Page - 1)">
+        <LucideIcon Name="chevron-right" Size="15" />
+    </button>
+    @foreach (var number in VisiblePages())
+    {
+        var target = number;
+        <button type="button"
+                aria-current="@(target == Page ? "page" : null)"
+                aria-label="@($"صفحه {PersianText.Fa(target)}")"
+                @onclick="() => GoAsync(target)">@PersianText.Fa(target)</button>
+    }
+    <button type="button" disabled="@(Page >= PageCount)" aria-label="صفحه بعد" @onclick="() => GoAsync(Page + 1)">
+        <LucideIcon Name="chevron-left" Size="15" />
+    </button>
+</nav>
+
+@code {
+    [Parameter] public int Page { get; set; } = 1;
+    [Parameter] public EventCallback<int> PageChanged { get; set; }
+    [Parameter] public int PageCount { get; set; } = 1;
+    [Parameter] public string? Class { get; set; }
+
+    private IEnumerable<int> VisiblePages()
+    {
+        const int window = 5;
+        var start = Math.Max(1, Page - window / 2);
+        var end = Math.Min(PageCount, start + window - 1);
+        start = Math.Max(1, end - window + 1);
+        for (var i = start; i <= end; i++) yield return i;
+    }
+
+    private async Task GoAsync(int next)
+    {
+        if (next < 1 || next > PageCount || next == Page) return;
+        Page = next;
+        await PageChanged.InvokeAsync(Page);
+    }
+}

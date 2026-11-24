@@ -1,0 +1,39 @@
+@inject IJSRuntime JS
+
+<select class="theme-select" aria-label="سیستم طراحی" value="@_theme" @onchange="OnChangeAsync">
+    <option value="graphite">گرافیت</option>
+    <option value="turquoise">فیروزه</option>
+    <option value="saffron">زعفران</option>
+    <option value="pomegranate">انار</option>
+    <option value="lapis">لاجورد</option>
+    <option value="paper">کاغذ</option>
+</select>
+
+@code {
+    private string _theme = "graphite";
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+        try
+        {
+            var saved = await JS.InvokeAsync<string?>("vfTheme.get");
+            if (!string.IsNullOrWhiteSpace(saved) && saved != _theme)
+            {
+                _theme = saved;
+                StateHasChanged();
+            }
+        }
+        catch (JSDisconnectedException) { }
+    }
+
+    private async Task OnChangeAsync(ChangeEventArgs args)
+    {
+        _theme = args.Value?.ToString() ?? "graphite";
+        try
+        {
+            await JS.InvokeVoidAsync("vfTheme.set", _theme);
+        }
+        catch (JSDisconnectedException) { }
+    }
+}

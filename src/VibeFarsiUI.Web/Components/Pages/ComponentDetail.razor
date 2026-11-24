@@ -1,0 +1,235 @@
+@page "/components/{Slug}"
+@inject IRegistryProvider Registry
+@inject RazorSourceCatalog Sources
+@inject IConfiguration Configuration
+@using VibeFarsiUI.Web.Catalog
+@using VibeFarsiUI.Web.Services
+
+@if (_item is null)
+{
+    <PageTitle>کامپوننت پیدا نشد — وایب‌فارسی</PageTitle>
+    <EmptyState Title="این کامپوننت وجود ندارد" Description="ممکن است نشانی تغییر کرده باشد.">
+        <a class="vf-btn vf-btn--outline vf-btn--sm" href="/components">بازگشت به کامپوننت‌ها</a>
+    </EmptyState>
+}
+else
+{
+    <PageTitle>@(_item.Name) — کامپوننت فارسی Blazor | وایب‌فارسی</PageTitle>
+    <HeadContent>
+        <meta name="description" content="@_item.Desc" />
+        <link rel="canonical" href="@($"{BaseUrl}/components/{_item.Slug}")" />
+        <meta property="og:title" content="@_item.Name — وایب‌فارسی" />
+        <meta property="og:description" content="@_item.Desc" />
+    </HeadContent>
+
+    <div class="doc-page">
+        <Breadcrumb Items="_crumbs" />
+
+        <header class="doc-header">
+            <div>
+                <div class="vf-row" style="margin-bottom:.5rem">
+                    <Badge Variant="secondary">@_item.PersianType</Badge>
+                    @if (_entry is not null)
+                    {
+                        <Badge Variant="success">بومی Blazor</Badge>
+                    }
+                    else
+                    {
+                        <Badge Variant="warning">در صف مهاجرت</Badge>
+                    }
+                    @if (!string.IsNullOrEmpty(_item.Category))
+                    {
+                        <Badge Variant="outline">@_item.Category</Badge>
+                    }
+                </div>
+                <h1>@_item.Name</h1>
+                @if (!string.IsNullOrEmpty(_item.NameEn))
+                {
+                    <span class="catalog-card__slug">@_item.NameEn</span>
+                }
+                <p>@_item.Desc</p>
+            </div>
+            <div class="vf-row">
+                <CopyButton Text="@($"{BaseUrl}/components/{_item.Slug}")" Label="کپی پیوند" />
+                <a class="vf-btn vf-btn--outline vf-btn--sm" href="/r/components/@(_item.Slug).json" target="_blank" rel="noopener">
+                    <LucideIcon Name="database" Size="14" /> JSON رجیستری
+                </a>
+            </div>
+        </header>
+
+        <div class="tabs-bar" role="tablist" aria-label="بخش‌های مستندات">
+            <button type="button" role="tab" aria-selected="@(_tab == "preview" ? "true" : "false")" @onclick='() => _tab = "preview"'>پیش‌نمایش</button>
+            <button type="button" role="tab" aria-selected="@(_tab == "props" ? "true" : "false")" @onclick='() => _tab = "props"'>پارامترها</button>
+            <button type="button" role="tab" aria-selected="@(_tab == "code" ? "true" : "false")" @onclick='() => _tab = "code"'>کد</button>
+            <button type="button" role="tab" aria-selected="@(_tab == "prompt" ? "true" : "false")" @onclick='() => _tab = "prompt"'>پرامپت AI</button>
+        </div>
+
+        @if (_tab == "preview")
+        {
+            @if (_entry is not null)
+            {
+                <section class="doc-section">
+                    <div class="preview-panel preview-panel--start">
+                        <ComponentPreview Slug="@Slug" />
+                    </div>
+                    <p class="vf-hint" style="margin-top:.5rem">پیش‌نمایش بالا همان کامپوننت Blazor است، نه تصویر یا ماکاپ.</p>
+                </section>
+            }
+            else
+            {
+                <Alert Variant="warning" Title="این کامپوننت هنوز به Blazor منتقل نشده است">
+                    متادیتا، سورس اصلی و پرامپت هوش مصنوعی در دسترس است؛ اما پیش‌نمایش زنده تا تکمیل مهاجرت نمایش داده نمی‌شود.
+                </Alert>
+            }
+        }
+        else if (_tab == "props")
+        {
+            <section class="doc-section">
+                <h2>پارامترها</h2>
+                @if (_entry is null)
+                {
+                    <p class="vf-muted">پس از مهاجرت، جدول پارامترها از روی <code>[Parameter]</code>های کامپوننت ساخته می‌شود.</p>
+                }
+                else
+                {
+                    <div class="vf-table-wrap">
+                        <table class="props-table">
+                            <thead>
+                                <tr><th>نام</th><th>نوع</th><th>پیش‌فرض</th><th>توضیح</th></tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var parameter in _parameters)
+                                {
+                                    <tr>
+                                        <td><code>@parameter.Name</code></td>
+                                        <td><code>@parameter.Type</code></td>
+                                        <td><code>@parameter.Default</code></td>
+                                        <td>@parameter.Description</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </section>
+        }
+        else if (_tab == "code")
+        {
+            <section class="doc-section vf-stack">
+                <h2>نمونه استفاده</h2>
+                @if (_entry is not null)
+                {
+                    <CodeViewer Code="@_entry.Usage" Language="razor" Title="Usage.razor" MaxHeight="22rem" />
+                }
+                else
+                {
+                    <p class="vf-muted">نمونه‌ی Blazor پس از مهاجرت اضافه می‌شود.</p>
+                }
+
+                @if (_entry is not null && !string.IsNullOrEmpty(_source))
+                {
+                    <h2>سورس کامپوننت</h2>
+                    <CodeViewer Code="@_source" Language="razor" Title="@($"{_entry.SourceKey}.razor")" MaxHeight="34rem" />
+                }
+
+                @if (!string.IsNullOrEmpty(_originalSource))
+                {
+                    <h2>سورس اصلی React</h2>
+                    <p class="vf-muted">این فایل فقط برای مرجع نگه داشته شده است؛ برنامه‌ی Blazor در زمان اجرا به آن وابسته نیست.</p>
+                    <CodeViewer Code="@_originalSource" Language="tsx" Title="@_item.File" MaxHeight="30rem" />
+                }
+            </section>
+        }
+        else
+        {
+            <section class="doc-section vf-stack">
+                <h2>پرامپت هوش مصنوعی</h2>
+                <p class="vf-muted">همان پرامپتی که رجیستری برای ساخت این کامپوننت ارائه می‌دهد.</p>
+                <CodeViewer Code="@(_item.Prompt ?? "پرامپتی ثبت نشده است.")" Language="text" Title="prompt.md" MaxHeight="30rem" />
+                <h2>دسترسی ماشینی</h2>
+                <CodeViewer Code="@($"curl {BaseUrl}/r/components/{_item.Slug}.json")" Language="bash" Title="terminal" MaxHeight="8rem" />
+            </section>
+        }
+
+        <section class="doc-section">
+            <h2>نصب و استفاده در Blazor</h2>
+            @if (_entry is not null)
+            {
+                <div class="prose">
+                    <p>این کامپوننت بخشی از کتابخانه‌ی بومی همین مخزن است. برای استفاده:</p>
+                    <ol>
+                        <li>فایل <code>Components/UI/@(_entry.SourceKey).razor</code> را به پروژه‌ی Blazor خود اضافه کنید.</li>
+                        <li>استایل‌های <code>wwwroot/css/components.css</code> و توکن‌های <code>wwwroot/css/themes.css</code> را کپی کنید.</li>
+                        <li>در بالای فایل Razor، فضای نام <code>VibeFarsiUI.Web.Components.UI</code> را import کنید.</li>
+                    </ol>
+                    <p>اگر رجیستری را مصرف می‌کنید، همین کامپوننت با JSON زیر قابل دریافت است:</p>
+                </div>
+                <CodeViewer Code="@($"curl {BaseUrl}/r/components/{_item.Slug}.json")" Language="bash" Title="terminal" MaxHeight="8rem" />
+            }
+            else
+            {
+                <div class="notice">
+                    <strong>وضعیت مهاجرت</strong>
+                    مسیر اصلی: <code>@_item.File</code> — وابستگی‌ها: @(_item.Deps.Count == 0 ? "بدون وابستگی" : string.Join("، ", _item.Deps)).
+                    نسخه‌ی Blazor این کامپوننت هنوز پیاده‌سازی نشده است.
+                </div>
+            }
+        </section>
+
+        @if (_related.Count > 0)
+        {
+            <section class="doc-section">
+                <div class="section__head">
+                    <h2>کامپوننت‌های مرتبط</h2>
+                </div>
+                <div class="grid">
+                    @foreach (var item in _related)
+                    {
+                        <ComponentCard Item="item" />
+                    }
+                </div>
+            </section>
+        }
+    </div>
+}
+
+@code {
+    [Parameter] public string Slug { get; set; } = string.Empty;
+
+    private string BaseUrl => Configuration["Site:Url"] ?? "https://vibefarsi.ir";
+
+    private RegistryItemSummary? _item;
+    private MigratedComponents.Entry? _entry;
+    private string? _source;
+    private string? _originalSource;
+    private IReadOnlyList<ComponentParameters.Row> _parameters = [];
+    private IReadOnlyList<RegistryItemSummary> _related = [];
+    private IReadOnlyList<BreadcrumbItem> _crumbs = [];
+    private string _tab = "preview";
+    private string? _loadedSlug;
+
+    protected override void OnParametersSet()
+    {
+        if (_loadedSlug == Slug) return;
+        _loadedSlug = Slug;
+        _item = Registry.FindBySlug(Slug);
+        if (_item is null) return;
+
+        _entry = MigratedComponents.Get(Slug);
+        _source = _entry is null ? null : Sources.Get(_entry.SourceKey);
+        _originalSource = Registry.GetSource(_item.Type, _item.Slug);
+        _parameters = _entry is null ? [] : ComponentParameters.For(_entry.ComponentType);
+        _related = Registry.Items
+            .Where(i => i.Type == _item.Type && i.Slug != _item.Slug &&
+                        (i.Category == _item.Category || string.IsNullOrEmpty(_item.Category)))
+            .Take(4)
+            .ToList();
+        _crumbs =
+        [
+            new BreadcrumbItem("خانه", "/"),
+            new BreadcrumbItem("کامپوننت‌ها", "/components"),
+            new BreadcrumbItem(_item.Name)
+        ];
+        _tab = "preview";
+    }
+}

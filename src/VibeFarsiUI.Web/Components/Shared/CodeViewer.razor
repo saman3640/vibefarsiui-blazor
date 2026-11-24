@@ -1,0 +1,26 @@
+@* Line-numbered code viewer with copy support. *@
+@using VibeFarsiUI.Web.Services
+
+<div class="code-viewer @Class">
+    <div class="code-viewer__head">
+        <span class="code-viewer__title">@(string.IsNullOrEmpty(Title) ? Language : Title)</span>
+        <CopyButton Text="Code" Label="کپی کد" />
+    </div>
+    <pre class="code-block" style="@(string.IsNullOrEmpty(MaxHeight) ? null : $"max-height:{MaxHeight}")"><code>
+@for (var i = 0; i < Lines.Length; i++)
+{
+    var number = i + 1;
+    <span class="code-line"><span class="code-line__no" aria-hidden="true">@number</span><span class="code-line__code">@((MarkupString)CodeHighlighter.HighlightLine(Lines[i], Language))</span></span>
+}
+    </code></pre>
+</div>
+
+@code {
+    [Parameter] public string Code { get; set; } = string.Empty;
+    [Parameter] public string Language { get; set; } = "razor";
+    [Parameter] public string? Title { get; set; }
+    [Parameter] public string? MaxHeight { get; set; }
+    [Parameter] public string? Class { get; set; }
+
+    private string[] Lines => (Code ?? string.Empty).Replace("\r\n", "\n").Split('\n');
+}

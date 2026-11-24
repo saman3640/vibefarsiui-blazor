@@ -1,0 +1,24 @@
+@* Ported from registry/ui/breadcrumb.tsx. *@
+<nav class="vf-crumbs @Class" aria-label="مسیر صفحه">
+    @for (var i = 0; i < Items.Count; i++)
+    {
+        var item = Items[i];
+        if (i > 0)
+        {
+            <LucideIcon Name="chevron-left" Size="13" />
+        }
+        if (!string.IsNullOrEmpty(item.Href))
+        {
+            <a href="@item.Href">@item.Label</a>
+        }
+        else
+        {
+            <span aria-current="page">@item.Label</span>
+        }
+    }
+</nav>
+
+@code {
+    [Parameter] public IReadOnlyList<BreadcrumbItem> Items { get; set; } = [];
+    [Parameter] public string? Class { get; set; }
+}

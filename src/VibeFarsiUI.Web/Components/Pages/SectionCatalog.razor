@@ -1,0 +1,144 @@
+@page "/blocks"
+@page "/charts"
+@page "/calendar"
+@page "/animations"
+@page "/backgrounds"
+@page "/templates"
+@page "/skills"
+@page "/sites"
+@inject IRegistryProvider Registry
+@inject NavigationManager Nav
+@inject IConfiguration Configuration
+
+<PageTitle>@($"{Meta.Title} — وایب‌فارسی")</PageTitle>
+<HeadContent>
+    <meta name="description" content="@Meta.Description" />
+    <link rel="canonical" href="@($"{BaseUrl}/{Section}")" />
+</HeadContent>
+
+<header class="doc-header" style="margin-bottom:1.5rem">
+    <div>
+        <span class="hero__eyebrow">@PersianText.Fa(All.Count) @Meta.Unit</span>
+        <h1>@Meta.Title</h1>
+        <p>@Meta.Description</p>
+    </div>
+</header>
+
+<div class="search-row">
+    <SearchInput @bind-Value="_query" Placeholder="@($"جست‌وجو در {Meta.Title}…")" AriaLabel="@($"جست‌وجوی {Meta.Title}")" />
+    <Badge Variant="secondary">@PersianText.Fa(Filtered.Count) نتیجه</Badge>
+</div>
+
+@if (Section == "calendar")
+{
+    <section class="section" style="margin-top:0">
+        <div class="preview-panel preview-panel--start">
+            <div class="vf-demo-grid" style="align-items:start">
+                <JalaliDatePicker @bind-Value="_date" />
+                <div class="vf-stack">
+                    <h2 style="font-size:1.1rem">تقویم شمسی بومی</h2>
+                    <p class="vf-muted">
+                        این تقویم در Blazor با الگوریتم جلالی پیاده‌سازی شده است: شنبه اول هفته،
+                        تعطیلی جمعه، ناوبری ماه و انتخاب روز. تاریخ انتخابی:
+                    </p>
+                    <Alert Variant="info">@( _date is null ? "روزی انتخاب نشده" : JalaliCalendar.Format(_date.Value, weekday: true))</Alert>
+                    <div class="vf-row">
+                        <Badge Variant="secondary">@JalaliCalendar.FormatNumeric(DateTime.Today)</Badge>
+                        <Badge Variant="secondary">@JalaliCalendar.WeekdayNames[JalaliCalendar.Weekday(DateTime.Today)]</Badge>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+}
+
+@if (Categories.Count > 1)
+{
+    <div class="chip-row" style="margin-bottom:1.5rem">
+        @foreach (var category in Categories)
+        {
+            <button type="button"
+                    class="chip"
+                    aria-pressed="@(category.Key == _category ? "true" : "false")"
+                    @onclick="() => _category = category.Key">
+                @category.Label <span class="vf-muted">@PersianText.Fa(category.Count)</span>
+            </button>
+        }
+    </div>
+}
+
+@if (Filtered.Count == 0)
+{
+    <EmptyState Title="موردی پیدا نشد" Description="عبارت جست‌وجو را تغییر دهید." />
+}
+else
+{
+    <div class="grid">
+        @foreach (var item in Filtered)
+        {
+            <ComponentCard Item="item" />
+        }
+    </div>
+}
+
+@code {
+    private string? _query;
+    private string _category = "all";
+    private DateTime? _date = DateTime.Today;
+
+    private string BaseUrl => Configuration["Site:Url"] ?? "https://vibefarsi.ir";
+
+    private string Section
+    {
+        get
+        {
+            var path = new Uri(Nav.Uri).AbsolutePath.Trim('/').ToLowerInvariant();
+            return path.Split('/')[0];
+        }
+    }
+
+    private string Type => Section switch
+    {
+        "blocks" => "block",
+        "charts" => "chart",
+        "calendar" => "calendar",
+        "animations" => "animation",
+        "backgrounds" => "background",
+        "templates" => "template",
+        "skills" => "skill",
+        "sites" => "site",
+        _ => "component"
+    };
+
+    private sealed record SectionMeta(string Title, string Description, string Unit);
+
+    private SectionMeta Meta => Section switch
+    {
+        "blocks" => new("بلاک‌ها", "بخش‌های آماده‌ی صفحه: هدر، فوتر، جدول، داشبورد و فرم‌های کامل.", "بلاک"),
+        "charts" => new("نمودارها", "نمودارهای سبک با SVG؛ روند، مقایسه، سهم از کل و داده‌های مالی.", "نمودار"),
+        "calendar" => new("تقویم", "نماها، برنامه‌ریزی، نوبت‌دهی و مناسبت‌های تقویم شمسی.", "آیتم تقویم"),
+        "animations" => new("انیمیشن‌ها", "ریزحرکت‌های CSS با احترام به prefers-reduced-motion.", "انیمیشن"),
+        "backgrounds" => new("پس‌زمینه‌ها", "بافت، شبکه و گرادیان‌های هماهنگ با تم‌ها.", "پس‌زمینه"),
+        "templates" => new("قالب‌ها", "صفحات کامل برای محصول، فروشگاه، داشبورد و وبلاگ.", "قالب"),
+        "skills" => new("مهارت‌ها", "راهنماها و پرامپت‌های هوش مصنوعی برای ساخت رابط فارسی.", "مهارت"),
+        "sites" => new("سایت‌ها", "سایت‌های کامل ساخته‌شده با اکوسیستم وایب‌فارسی.", "سایت"),
+        _ => new("کامپوننت‌ها", "کامپوننت‌های فارسی.", "کامپوننت")
+    };
+
+    private IReadOnlyList<RegistryItemSummary> All => Registry.BySection(Section);
+
+    private IReadOnlyList<CategoryInfo> Categories => Registry.CategoriesFor(Type);
+
+    private IReadOnlyList<RegistryItemSummary> Filtered
+    {
+        get
+        {
+            IReadOnlyList<RegistryItemSummary> items = string.IsNullOrWhiteSpace(_query)
+                ? All
+                : Registry.Search(_query, Type, 500);
+            if (_category != "all")
+                items = items.Where(i => string.Equals(i.Category, _category, StringComparison.OrdinalIgnoreCase)).ToList();
+            return items;
+        }
+    }
+}

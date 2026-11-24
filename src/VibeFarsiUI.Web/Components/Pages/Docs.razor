@@ -1,0 +1,131 @@
+@page "/docs"
+
+<PageTitle>مستندات — وایب‌فارسی Blazor</PageTitle>
+<HeadContent>
+    <meta name="description" content="راهنمای نصب و استفاده از وایب‌فارسی در .NET 10 Blazor: معماری، رجیستری، تقویم شمسی و تست." />
+</HeadContent>
+
+<div class="doc-page">
+    <header class="doc-header">
+        <div>
+            <span class="hero__eyebrow">.NET 10 · Blazor Web App</span>
+            <h1>مستندات</h1>
+            <p>راه‌اندازی، معماری و قراردادهای نسخه‌ی Blazor وایب‌فارسی.</p>
+        </div>
+        <CopyButton Text="dotnet run --project src/VibeFarsiUI.Web" Label="کپی دستور اجرا" />
+    </header>
+
+    <nav class="vf-crumbs" aria-label="فهرست مطالب">
+        <a href="#start">شروع سریع</a>
+        <span>·</span>
+        <a href="#architecture">معماری</a>
+        <span>·</span>
+        <a href="#components">کامپوننت‌ها</a>
+        <span>·</span>
+        <a href="#registry">رجیستری</a>
+        <span>·</span>
+        <a href="#persian">فارسی و تقویم</a>
+        <span>·</span>
+        <a href="#tests">تست</a>
+    </nav>
+
+    <section class="doc-section" id="start">
+        <h2>شروع سریع</h2>
+        <div class="prose">
+            <p>پیش‌نیاز: .NET 10 SDK. سپس در ریشه‌ی مخزن:</p>
+        </div>
+        <CodeViewer Language="bash" Title="terminal" Code="@TerminalCommands" />
+        <p class="vf-muted">سایت به‌صورت پیش‌فرض روی یک پورت لوکال بالا می‌آید؛ در Visual Studio 2026 پروژه‌ی <code>VibeFarsiUI.Web</code> را به‌عنوان Startup انتخاب و F5 بزنید.</p>
+    </section>
+
+    <section class="doc-section" id="architecture">
+        <h2>معماری</h2>
+        <div class="vf-table-wrap">
+            <table class="props-table">
+                <thead><tr><th>پروژه</th><th>نقش</th></tr></thead>
+                <tbody>
+                    <tr><td><code>VibeFarsiUI.Web</code></td><td>Blazor Web App، صفحات، کامپوننت‌های Razor و wwwroot</td></tr>
+                    <tr><td><code>VibeFarsiUI.Core</code></td><td>تقویم جلالی، قالب‌بندی فارسی، اعتبارسنجی ایرانی و مدل‌های رجیستری</td></tr>
+                    <tr><td><code>VibeFarsiUI.Infrastructure</code></td><td>خواندن رجیستری JSON و سرویس‌های زیرساختی</td></tr>
+                    <tr><td><code>VibeFarsiUI.UnitTests</code></td><td>تست‌های تقویم، فرمت‌ها، اعتبارسنجی و رجیستری</td></tr>
+                    <tr><td><code>VibeFarsiUI.ComponentTests</code></td><td>تست‌های کامپوننت</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <p class="vf-muted">رندر تعاملی Server است؛ تعامل‌های ساده با CSS و مقدار کمی JS انجام می‌شوند.</p>
+    </section>
+
+    <section class="doc-section" id="components">
+        <h2>استفاده از کامپوننت‌ها</h2>
+        <div class="prose">
+            <p>تمام کامپوننت‌ها در فضای نام <code>VibeFarsiUI.Web.Components.UI</code> قرار دارند و با ویژگی‌های <code>[Parameter]</code> و <code>EventCallback</code> قابل اتصال‌اند.</p>
+        </div>
+        <CodeViewer Language="razor" Title="Example.razor" Code="@ExampleCode" />
+        <div class="prose">
+            <p>جدول پارامترهای هر کامپوننت به‌صورت خودکار از روی <code>[Parameter]</code>ها ساخته می‌شود؛ نمونه را در صفحه‌ی هر کامپوننت ببینید.</p>
+        </div>
+    </section>
+
+    <section class="doc-section" id="registry">
+        <h2>رجیستری و قرارداد ماشینی</h2>
+        <div class="prose">
+            <p>همان رجیستری اصلی بدون تغییر داده، از طریق ASP.NET Core Minimal API سرو می‌شود. CLI و MCP می‌توانند همان قرارداد قبلی را مصرف کنند.</p>
+        </div>
+        <CodeViewer Language="bash" Title="registry endpoints" Code="@RegistryEndpoints" />
+        <div class="prose">
+            <p>سایت در زمان اجرا به Node.js، Next.js یا React وابسته نیست. ابزارهای CLI و MCP به‌صورت مستقل باقی مانده‌اند.</p>
+        </div>
+    </section>
+
+    <section class="doc-section" id="persian">
+        <h2>فارسی، اعداد و تقویم</h2>
+        <div class="vf-demo-grid">
+            <Card Title="قالب‌بندی"><Price Amount="2450000" /><p class="vf-hint">@PersianText.FormatToman(2450000)</p></Card>
+            <Card Title="تاریخ شمسی"><p>@JalaliCalendar.Format(DateTime.Today, weekday: true)</p><p class="vf-hint">@JalaliCalendar.FormatNumeric(DateTime.Today)</p></Card>
+        </div>
+        <CodeViewer Language="csharp" Title="PersianText.cs" Code="@PersianExamples" />
+    </section>
+
+    <section class="doc-section" id="tests">
+        <h2>تست و وضعیت مهاجرت</h2>
+        <div class="prose">
+            <p>تست‌های واحد تقویم، اعداد، تومان، اعتبارسنجی و بارگذاری/جست‌وجوی رجیستری را پوشش می‌دهند. فهرست وضعیت کامپوننت‌ها در <code>docs/COMPONENT_MIGRATION_STATUS.md</code> نگهداری می‌شود و تحلیل کامل در <code>docs/MIGRATION_ANALYSIS.md</code> است.</p>
+        </div>
+        <CodeViewer Language="bash" Title="terminal" Code="@TestCommand" />
+    </section>
+</div>
+
+@code {
+    private const string TerminalCommands = """
+        dotnet restore
+        dotnet build
+        dotnet test
+        dotnet run --project src/VibeFarsiUI.Web
+        """;
+
+    private const string ExampleCode = """
+        <Field Label="شماره موبایل">
+            <PhoneInput @bind-Value="phone" />
+        </Field>
+
+        <Price Amount="2450000" OldAmount="2900000" Size="lg" />
+
+        <JalaliDatePicker @bind-Value="date" />
+        """;
+
+    private const string RegistryEndpoints = """
+        GET /r/catalog
+        GET /r/components/button.json
+        GET /r/charts/…
+        GET /r/themes/…
+        """;
+
+    private const string PersianExamples = """
+        PersianText.FaNumber(2450000);   // ۲٬۴۵۰٬۰۰۰
+        PersianText.FormatToman(2450000); // ۲٬۴۵۰٬۰۰۰ تومان
+        JalaliCalendar.Format(DateTime.Today, weekday: true);
+        IranianValidation.FormatMobile("09123456789");
+        """;
+
+    private const string TestCommand = "dotnet test VibeFarsiUI.sln";
+}

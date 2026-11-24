@@ -1,0 +1,17 @@
+@* Ported from registry/ui/stat.tsx. *@
+<div class="vf-stat @Class" @attributes="AdditionalAttributes">
+    <span class="vf-stat__label">@Label</span>
+    <span class="vf-stat__value">@Value</span>
+    @if (!string.IsNullOrEmpty(Hint))
+    {
+        <span class="vf-stat__hint">@Hint</span>
+    }
+</div>
+
+@code {
+    [Parameter] public string Label { get; set; } = string.Empty;
+    [Parameter] public string Value { get; set; } = string.Empty;
+    [Parameter] public string? Hint { get; set; }
+    [Parameter] public string? Class { get; set; }
+    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+}

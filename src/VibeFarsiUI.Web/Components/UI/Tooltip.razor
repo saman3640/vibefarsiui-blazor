@@ -1,0 +1,11 @@
+@* Ported from registry/ui/tooltip.tsx — CSS-only, no portal needed. *@
+<span class="vf-tooltip @Class">
+    @ChildContent
+    <span class="vf-tooltip__bubble" role="tooltip">@Text</span>
+</span>
+
+@code {
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public string Text { get; set; } = string.Empty;
+    [Parameter] public string? Class { get; set; }
+}

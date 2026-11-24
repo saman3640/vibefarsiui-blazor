@@ -1,0 +1,55 @@
+@* Ported from registry/ui/number-field.tsx — Persian digits, stepper buttons and clamping. *@
+<div class="vf-field">
+    @if (!string.IsNullOrEmpty(Label))
+    {
+        <label class="vf-label" for="@Id">@Label</label>
+    }
+    <div class="vf-number @Class">
+        <button type="button" aria-label="کاهش" disabled="@(Disabled || Value <= Min)" @onclick="DecrementAsync">
+            <LucideIcon Name="minus" Size="15" />
+        </button>
+        <input id="@Id"
+               type="text"
+               dir="ltr"
+               inputmode="numeric"
+               value="@PersianText.Fa(Value)"
+               disabled="@Disabled"
+               aria-label="@(Label ?? "عدد")"
+               @oninput="OnInputAsync" />
+        <button type="button" aria-label="افزایش" disabled="@(Disabled || Value >= Max)" @onclick="IncrementAsync">
+            <LucideIcon Name="plus" Size="15" />
+        </button>
+    </div>
+    @if (!string.IsNullOrEmpty(Hint))
+    {
+        <span class="vf-hint">@Hint</span>
+    }
+</div>
+
+@code {
+    [Parameter] public int Value { get; set; }
+    [Parameter] public EventCallback<int> ValueChanged { get; set; }
+    [Parameter] public int Min { get; set; } = int.MinValue;
+    [Parameter] public int Max { get; set; } = int.MaxValue;
+    [Parameter] public string? Label { get; set; }
+    [Parameter] public string? Hint { get; set; }
+    [Parameter] public string? Id { get; set; } = $"vf-number-{Guid.NewGuid():N}";
+    [Parameter] public bool Disabled { get; set; }
+    [Parameter] public string? Class { get; set; }
+
+    private async Task IncrementAsync() => await SetAsync(Value + 1);
+    private async Task DecrementAsync() => await SetAsync(Value - 1);
+
+    private async Task OnInputAsync(ChangeEventArgs args)
+    {
+        var digits = PersianText.En(args.Value?.ToString()).Where(char.IsDigit).ToArray();
+        if (digits.Length == 0) return;
+        if (int.TryParse(new string(digits), out var parsed)) await SetAsync(parsed);
+    }
+
+    private async Task SetAsync(int next)
+    {
+        Value = Math.Clamp(next, Min, Max);
+        await ValueChanged.InvokeAsync(Value);
+    }
+}

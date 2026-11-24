@@ -1,0 +1,25 @@
+@* Ported from registry/ui/skeleton.tsx. *@
+<div class="vf-skeleton @Class"
+     style="@Style"
+     aria-hidden="true"
+     @attributes="AdditionalAttributes"></div>
+
+@code {
+    [Parameter] public string? Width { get; set; }
+    [Parameter] public string? Height { get; set; }
+    [Parameter] public string? Radius { get; set; }
+    [Parameter] public string? Class { get; set; }
+    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private string Style
+    {
+        get
+        {
+            var parts = new List<string>();
+            if (!string.IsNullOrEmpty(Width)) parts.Add($"width:{Width}");
+            if (!string.IsNullOrEmpty(Height)) parts.Add($"min-height:{Height}");
+            if (!string.IsNullOrEmpty(Radius)) parts.Add($"border-radius:{Radius}");
+            return string.Join(';', parts);
+        }
+    }
+}

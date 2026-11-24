@@ -1,0 +1,28 @@
+@* Ported from registry/ui/progress.tsx. *@
+<div class="vf-stack" style="gap:.35rem">
+    @if (!string.IsNullOrEmpty(Label) || ShowValue)
+    {
+        <div class="vf-row" style="justify-content:space-between">
+            @if (!string.IsNullOrEmpty(Label))
+            {
+                <span class="vf-label">@Label</span>
+            }
+            @if (ShowValue)
+            {
+                <span class="vf-hint">@PersianText.FaPercent(Percent)</span>
+            }
+        </div>
+    }
+    <div class="vf-progress" role="progressbar" aria-valuemin="0" aria-valuemax="@Max" aria-valuenow="@Value" aria-label="@Label">
+        <div class="vf-progress__bar" style="width:@(Percent.ToString("0.#", System.Globalization.CultureInfo.InvariantCulture))%"></div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public double Value { get; set; }
+    [Parameter] public double Max { get; set; } = 100;
+    [Parameter] public string? Label { get; set; }
+    [Parameter] public bool ShowValue { get; set; }
+
+    private double Percent => Max <= 0 ? 0 : Math.Clamp(Value / Max * 100, 0, 100);
+}

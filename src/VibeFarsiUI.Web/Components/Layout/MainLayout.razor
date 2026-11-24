@@ -1,0 +1,38 @@
+@inherits LayoutComponentBase
+
+<div class="site-shell">
+    <header class="site-header">
+        <div class="container site-header__inner">
+            <a class="brand" href="/" aria-label="وایب‌فارسی، صفحه‌ی اصلی">
+                <span class="brand__mark">و</span>
+                <span>وایب‌فارسی</span>
+            </a>
+            <nav class="site-nav" aria-label="ناوبری اصلی">
+                <NavLink href="/components" Match="NavLinkMatch.All">کامپوننت‌ها</NavLink>
+                <NavLink href="/blocks">بلاک‌ها</NavLink>
+                <NavLink href="/charts">نمودارها</NavLink>
+                <NavLink href="/calendar">تقویم</NavLink>
+                <NavLink href="/animations">انیمیشن‌ها</NavLink>
+                <NavLink href="/backgrounds">پس‌زمینه‌ها</NavLink>
+                <NavLink href="/templates">قالب‌ها</NavLink>
+                <NavLink href="/themes">تم‌ها</NavLink>
+                <NavLink href="/skills">مهارت‌ها</NavLink>
+                <NavLink href="/docs">مستندات</NavLink>
+            </nav>
+            <div class="site-header__actions">
+                <ThemeSwitcher />
+            </div>
+        </div>
+    </header>
+
+    <main id="main" class="site-main container">
+        @Body
+    </main>
+
+    <footer class="site-footer">
+        <div class="container site-footer__inner">
+            <span>وایب‌فارسی · کامپوننت‌های فارسی برای Blazor و ASP.NET Core</span>
+            <span>راست‌چین، اعداد فارسی، تقویم شمسی و تومان — از پایه.</span>
+        </div>
+    </footer>
+</div>

@@ -1,0 +1,99 @@
+@page "/themes"
+@inject IRegistryProvider Registry
+@inject IJSRuntime JS
+
+<PageTitle>تم‌ها و سیستم طراحی — وایب‌فارسی</PageTitle>
+<HeadContent>
+    <meta name="description" content="شش سیستم طراحی فارسی با توکن‌های CSS: گرافیت، فیروزه، زعفران، انار، لاجورد و کاغذ." />
+</HeadContent>
+
+<header class="doc-header" style="margin-bottom:1.5rem">
+    <div>
+        <span class="hero__eyebrow">۶ سیستم طراحی</span>
+        <h1>تم‌ها</h1>
+        <p>رنگ، شعاع، سایه و تایپوگرافی همه از CSS variables می‌آیند و بدون بارگذاری دوباره اعمال می‌شوند.</p>
+    </div>
+</header>
+
+<div class="theme-grid">
+    @foreach (var theme in ThemeItems)
+    {
+        <div class="vf-stack">
+            <button type="button"
+                    class="theme-card"
+                    data-theme="@theme.Slug"
+                    aria-pressed="@(_active == theme.Slug ? "true" : "false")"
+                    @onclick="() => SelectAsync(theme.Slug)">
+                <div class="theme-card__swatches">
+                    <span class="theme-card__swatch" style="background:var(--brand)"></span>
+                    <span class="theme-card__swatch" style="background:var(--accent)"></span>
+                    <span class="theme-card__swatch" style="background:var(--background)"></span>
+                    <span class="theme-card__swatch" style="background:var(--foreground)"></span>
+                </div>
+                <h3>@theme.Name</h3>
+                <p>@theme.Desc</p>
+                <span class="vf-row" style="margin-top:.5rem">
+                    <Badge Variant="secondary" Solid>@theme.Slug</Badge>
+                </span>
+            </button>
+            <a class="section__link" href="/themes/@theme.Slug">جزئیات و توکن‌ها ←</a>
+        </div>
+    }
+</div>
+
+<section class="section">
+    <div class="section__head"><h2>پیش‌نمایش زنده</h2></div>
+    <div class="preview-panel preview-panel--start">
+        <div class="vf-demo-grid">
+            <Card Title="کارت نمونه" Description="همین حالا تم را عوض کنید">
+                <div class="vf-stack">
+                    <div class="vf-row">
+                        <Button>دکمه اصلی</Button>
+                        <Button Variant="outline">دوم</Button>
+                        <Badge Variant="brand" Solid>جدید</Badge>
+                    </div>
+                    <Input Value="متن نمونه" />
+                    <Progress Value="64" Label="پیشرفت" ShowValue />
+                </div>
+            </Card>
+            <Card>
+                <div class="vf-stack">
+                    <Stat Label="درآمد این ماه" Value="@PersianText.FormatToman(18450000)" Hint="+۸٪" />
+                    <Price Amount="1290000" OldAmount="1590000" />
+                    <Rating Value="4" ShowValue ReadOnly />
+                </div>
+            </Card>
+        </div>
+    </div>
+</section>
+
+@code {
+    private string _active = "graphite";
+
+    private IReadOnlyList<RegistryItemSummary> ThemeItems => Registry.BySection("themes");
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+        try
+        {
+            var saved = await JS.InvokeAsync<string?>("vfTheme.get");
+            if (!string.IsNullOrWhiteSpace(saved) && saved != _active)
+            {
+                _active = saved;
+                StateHasChanged();
+            }
+        }
+        catch (JSDisconnectedException) { }
+    }
+
+    private async Task SelectAsync(string slug)
+    {
+        _active = slug;
+        try
+        {
+            await JS.InvokeVoidAsync("vfTheme.set", slug);
+        }
+        catch (JSDisconnectedException) { }
+    }
+}

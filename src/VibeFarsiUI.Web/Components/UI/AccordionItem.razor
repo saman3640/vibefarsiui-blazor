@@ -1,0 +1,37 @@
+@* Ported from registry/ui/accordion.tsx item. *@
+@implements IDisposable
+
+<div class="vf-acc__item" data-open="@(Open ? "true" : "false")">
+    <button type="button"
+            class="vf-acc__trigger"
+            aria-expanded="@(Open ? "true" : "false")"
+            @onclick="Toggle">
+        <span>@Title</span>
+        <LucideIcon Name="chevron-down" Size="16" />
+    </button>
+    @if (Open)
+    {
+        <div class="vf-acc__panel">@ChildContent</div>
+    }
+</div>
+
+@code {
+    [CascadingParameter] private Accordion? Parent { get; set; }
+    [Parameter] public string Title { get; set; } = string.Empty;
+    [Parameter] public bool InitiallyOpen { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    internal bool Open { get; private set; }
+
+    protected override void OnInitialized()
+    {
+        Open = InitiallyOpen;
+        Parent?.Register(this);
+    }
+
+    internal void SetOpen(bool open) => Open = open;
+
+    private void Toggle() => Parent?.Toggle(this);
+
+    public void Dispose() => Parent?.Unregister(this);
+}

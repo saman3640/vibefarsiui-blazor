@@ -1,0 +1,41 @@
+@* Ported from registry/ui/tabs.tsx — controlled active tab, optional content slot. *@
+<div class="vf-tabs @Class" role="tablist">
+    @foreach (var item in Items)
+    {
+        <button type="button"
+                role="tab"
+                aria-selected="@(item.Key == Active ? "true" : "false")"
+                disabled="@item.Disabled"
+                tabindex="@(item.Key == Active ? 0 : -1)"
+                @onclick="() => SelectAsync(item.Key)">
+            @item.Label
+            @if (!string.IsNullOrEmpty(item.Badge))
+            {
+                <span class="vf-badge vf-badge--secondary" style="margin-inline-start:.3rem">@item.Badge</span>
+            }
+        </button>
+    }
+</div>
+@if (ActiveContent is not null)
+{
+    <div role="tabpanel" style="margin-top:.85rem">@ActiveContent(Active)</div>
+}
+
+@code {
+    [Parameter] public IReadOnlyList<TabItem> Items { get; set; } = [];
+    [Parameter] public string Active { get; set; } = string.Empty;
+    [Parameter] public EventCallback<string> ActiveChanged { get; set; }
+    [Parameter] public RenderFragment<string>? ActiveContent { get; set; }
+    [Parameter] public string? Class { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        if (string.IsNullOrEmpty(Active) && Items.Count > 0) Active = Items[0].Key;
+    }
+
+    private async Task SelectAsync(string key)
+    {
+        Active = key;
+        await ActiveChanged.InvokeAsync(key);
+    }
+}

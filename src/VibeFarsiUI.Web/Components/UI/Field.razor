@@ -1,0 +1,24 @@
+@* Ported from registry/ui/input.tsx (Field helper). *@
+<div class="vf-field">
+    @if (!string.IsNullOrEmpty(Label))
+    {
+        <label class="vf-label" for="@For">@Label</label>
+    }
+    @ChildContent
+    @if (!string.IsNullOrEmpty(Error))
+    {
+        <span class="vf-error" role="alert">@Error</span>
+    }
+    else if (!string.IsNullOrEmpty(Hint))
+    {
+        <span class="vf-hint">@Hint</span>
+    }
+</div>
+
+@code {
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public string? Label { get; set; }
+    [Parameter] public string? Hint { get; set; }
+    [Parameter] public string? Error { get; set; }
+    [Parameter] public string? For { get; set; }
+}

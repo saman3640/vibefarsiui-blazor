@@ -1,0 +1,28 @@
+@page "/Error"
+
+<PageTitle>خطا — وایب‌فارسی</PageTitle>
+
+<div class="doc-page" style="padding-block:3rem">
+    <header class="doc-header">
+        <div>
+            <span class="hero__eyebrow">خطای سرور</span>
+            <h1>مشکلی پیش آمد</h1>
+            <p>درخواست شما انجام نشد. لطفاً دوباره تلاش کنید.</p>
+        </div>
+    </header>
+    @if (!string.IsNullOrEmpty(RequestId))
+    {
+        <Alert Variant="warning" Title="شناسه پیگیری">
+            @RequestId
+        </Alert>
+    }
+    <div class="vf-row">
+        <a class="vf-btn vf-btn--default" href="/">بازگشت به خانه</a>
+    </div>
+</div>
+
+@code {
+    [CascadingParameter] private HttpContext? HttpContext { get; set; }
+
+    private string? RequestId => HttpContext?.TraceIdentifier;
+}

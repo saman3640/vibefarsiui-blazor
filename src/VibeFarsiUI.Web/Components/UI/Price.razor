@@ -1,0 +1,23 @@
+@* Ported from registry/ui/price.tsx — Persian digits, Toman unit and optional old price. *@
+<div class="@Classes">
+    @if (OldAmount is not null)
+    {
+        <span class="vf-price__old">@PersianText.FaNumber(OldAmount.Value)</span>
+    }
+    <span class="vf-price__amount">@(Free ? "رایگان" : PersianText.FaNumber(Amount))</span>
+    @if (!Free && !string.IsNullOrEmpty(Unit))
+    {
+        <span class="vf-price__unit">@Unit</span>
+    }
+</div>
+
+@code {
+    [Parameter] public double Amount { get; set; }
+    [Parameter] public double? OldAmount { get; set; }
+    [Parameter] public string Unit { get; set; } = "تومان";
+    [Parameter] public bool Free { get; set; }
+    [Parameter] public string Size { get; set; } = "md";
+    [Parameter] public string? Class { get; set; }
+
+    private string Classes => Css.Join("vf-price", Size == "lg" ? "vf-price--lg" : null, Class);
+}

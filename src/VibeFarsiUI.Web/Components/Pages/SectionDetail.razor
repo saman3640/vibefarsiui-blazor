@@ -1,0 +1,177 @@
+@page "/blocks/{Slug}"
+@page "/charts/{Slug}"
+@page "/calendar/{Slug}"
+@page "/animations/{Slug}"
+@page "/backgrounds/{Slug}"
+@page "/templates/{Slug}"
+@page "/skills/{Slug}"
+@page "/sites/{Slug}"
+@page "/themes/{Slug}"
+@inject IRegistryProvider Registry
+@inject NavigationManager Nav
+@inject IConfiguration Configuration
+
+@if (_item is null)
+{
+    <PageTitle>مورد پیدا نشد — وایب‌فارسی</PageTitle>
+    <EmptyState Title="این مورد وجود ندارد" Description="نشانی را بررسی کنید یا از فهرست اصلی انتخاب کنید.">
+        <a class="vf-btn vf-btn--outline vf-btn--sm" href="/@Section">بازگشت</a>
+    </EmptyState>
+}
+else
+{
+    <PageTitle>@($"{_item.Name} — {_item.PersianType} | وایب‌فارسی")</PageTitle>
+    <HeadContent>
+        <meta name="description" content="@_item.Desc" />
+        <link rel="canonical" href="@($"{BaseUrl}/{Section}/{_item.Slug}")" />
+    </HeadContent>
+
+    <div class="doc-page">
+        <Breadcrumb Items="_crumbs" />
+        <header class="doc-header">
+            <div>
+                <div class="vf-row" style="margin-bottom:.5rem">
+                    <Badge Variant="secondary">@_item.PersianType</Badge>
+                    @if (!string.IsNullOrEmpty(_item.Category))
+                    {
+                        <Badge Variant="outline">@_item.Category</Badge>
+                    }
+                    @if (HasNativePreview)
+                    {
+                        <Badge Variant="success">پیش‌نمایش بومی</Badge>
+                    }
+                </div>
+                <h1>@_item.Name</h1>
+                <p>@_item.Desc</p>
+            </div>
+            <a class="vf-btn vf-btn--outline vf-btn--sm" href="/r/@Section/@(_item.Slug).json" target="_blank" rel="noopener">
+                <LucideIcon Name="database" Size="14" /> JSON
+            </a>
+        </header>
+
+        @if (HasNativePreview)
+        {
+            <section class="doc-section">
+                <h2>پیش‌نمایش</h2>
+                <div class="preview-panel preview-panel--start">
+                    <JalaliDatePicker @bind-Value="_date" />
+                </div>
+            </section>
+        }
+        else
+        {
+            <div class="notice">
+                <strong>این آیتم از اکوسیستم اصلی است</strong>
+                پیش‌نمایش بومی برای این مورد هنوز پیاده‌سازی نشده است؛ متادیتا، سورس اصلی و پرامپت در ادامه آمده و رفتار اصلی حفظ شده است.
+            </div>
+        }
+
+        <section class="doc-section">
+            <h2>مشخصات</h2>
+            <div class="vf-table-wrap">
+                <table class="props-table">
+                    <tbody>
+                        <tr><th>فایل اصلی</th><td><code dir="ltr">@_item.File</code></td></tr>
+                        <tr><th>مسیر مقصد</th><td><code dir="ltr">@_item.Target</code></td></tr>
+                        <tr><th>وابستگی‌ها</th><td>@(_item.Deps.Count == 0 ? "بدون وابستگی" : string.Join("، ", _item.Deps))</td></tr>
+                        <tr><th>وابستگی رجیستری</th><td>@(_item.RegistryDeps.Count == 0 ? "—" : string.Join("، ", _item.RegistryDeps))</td></tr>
+                        <tr><th>تگ‌ها</th><td>@(_item.Tags.Count == 0 ? "—" : string.Join("، ", _item.Tags))</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        @if (!string.IsNullOrEmpty(_source))
+        {
+            <section class="doc-section">
+                <h2>سورس اصلی</h2>
+                <CodeViewer Code="@_source" Language="@LanguageFor(_item.File)" Title="@_item.File" MaxHeight="36rem" />
+            </section>
+        }
+
+        @if (!string.IsNullOrEmpty(_item.Prompt))
+        {
+            <section class="doc-section">
+                <h2>پرامپت هوش مصنوعی</h2>
+                <CodeViewer Code="@_item.Prompt" Language="text" Title="prompt.md" MaxHeight="26rem" />
+            </section>
+        }
+
+        @if (_related.Count > 0)
+        {
+            <section class="doc-section">
+                <div class="section__head"><h2>مرتبط‌ها</h2></div>
+                <div class="grid">
+                    @foreach (var related in _related)
+                    {
+                        <ComponentCard Item="related" />
+                    }
+                </div>
+            </section>
+        }
+    </div>
+}
+
+@code {
+    [Parameter] public string Slug { get; set; } = string.Empty;
+
+    private RegistryItemSummary? _item;
+    private string? _source;
+    private IReadOnlyList<RegistryItemSummary> _related = [];
+    private IReadOnlyList<BreadcrumbItem> _crumbs = [];
+    private DateTime? _date = DateTime.Today;
+    private string? _loaded;
+
+    private string BaseUrl => Configuration["Site:Url"] ?? "https://vibefarsi.ir";
+
+    private string Section
+    {
+        get
+        {
+            var path = new Uri(Nav.Uri).AbsolutePath.Trim('/').ToLowerInvariant();
+            return path.Split('/')[0];
+        }
+    }
+
+    private string Type => Section switch
+    {
+        "blocks" => "block",
+        "charts" => "chart",
+        "calendar" => "calendar",
+        "animations" => "animation",
+        "backgrounds" => "background",
+        "templates" => "template",
+        "skills" => "skill",
+        "sites" => "site",
+        "themes" => "theme",
+        _ => "component"
+    };
+
+    private bool HasNativePreview => Section == "calendar" && Slug is "calendar" or "date-picker" or "jalali-calendar";
+
+    protected override void OnParametersSet()
+    {
+        var key = $"{Section}/{Slug}";
+        if (_loaded == key) return;
+        _loaded = key;
+        _item = Registry.Find(Type, Slug);
+        if (_item is null) return;
+        _source = Registry.GetSource(Type, Slug);
+        _related = Registry.Items.Where(i => i.Type == Type && i.Slug != Slug).Take(4).ToList();
+        _crumbs =
+        [
+            new BreadcrumbItem("خانه", "/"),
+            new BreadcrumbItem(Section, $"/{Section}"),
+            new BreadcrumbItem(_item.Name)
+        ];
+    }
+
+    private static string LanguageFor(string file) => Path.GetExtension(file).ToLowerInvariant() switch
+    {
+        ".tsx" or ".ts" => "tsx",
+        ".css" => "css",
+        ".md" => "markdown",
+        ".json" => "json",
+        _ => "text"
+    };
+}

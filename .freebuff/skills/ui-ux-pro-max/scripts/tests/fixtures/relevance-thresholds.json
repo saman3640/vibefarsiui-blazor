@@ -1,0 +1,265 @@
+{
+  "schemaVersion": 1,
+  "status": "provisional-baseline-regression-gate",
+  "baselineRevision": "97eb2a2",
+  "runtimeFingerprint": "e8d3ef8a9fd84452585f5399deba95532000e266a6846d4354646b3bac00880b",
+  "oracleFingerprint": "35c279931051bcd723fd76df250d82255b7ac6bae098c7d00822880d483855c3",
+  "approvingMaintainer": "repository maintainer approved Phase 1 testing checkpoint; second judgment review remains required before final-target promotion",
+  "units": "All metrics are ratios in [0,1]. Precision treats missing ranks as non-relevant. Negative abstention is measured across the hard-negative by domain/stack cross-product.",
+  "splitPolicy": {
+    "calibration": "May be inspected while tuning retrieval.",
+    "held_out": "Must not be inspected to tune ranking weights; used for final confirmation.",
+    "varianceAndConfidence": "Corpus is deterministic and has no sampling variance. Report exact ratios and sample counts; do not claim population confidence intervals from this curated set."
+  },
+  "tolerancePolicy": "A 1e-12 numeric tolerance permits floating-point representation only. Current known failures remain visible in relevance-baseline.json; the gate prevents regressions and does not claim final quality targets are met.",
+  "metrics": {
+    "designSystemCoherence": {
+      "floor": 1.0,
+      "tolerance": 1e-12
+    },
+    "mrrAt3": {
+      "floor": 0.8717948717948718,
+      "tolerance": 1e-12
+    },
+    "ndcgAt3": {
+      "floor": 0.8631923577043447,
+      "tolerance": 1e-12
+    },
+    "negativeAbstention": {
+      "floor": 0.9761904761904762,
+      "tolerance": 1e-12
+    },
+    "precisionAt1": {
+      "floor": 0.8205128205128205,
+      "tolerance": 1e-12
+    },
+    "precisionAt3": {
+      "floor": 0.3803418803418803,
+      "tolerance": 1e-12
+    },
+    "routingAccuracy": {
+      "floor": 1.0,
+      "tolerance": 1e-12
+    },
+    "typoRecoveryAt3": {
+      "floor": 1.0,
+      "tolerance": 1e-12
+    }
+  },
+  "sampleMinimums": {
+    "cases": 92,
+    "designSystem": 8,
+    "domain:chart": 2,
+    "domain:color": 2,
+    "domain:google-fonts": 2,
+    "domain:gsap": 2,
+    "domain:icons": 2,
+    "domain:landing": 2,
+    "domain:product": 2,
+    "domain:react": 2,
+    "domain:style": 2,
+    "domain:typography": 2,
+    "domain:ux": 2,
+    "domain:web": 2,
+    "negativeChecks": 210,
+    "retrieval": 78,
+    "routing": 8,
+    "stack:angular": 2,
+    "stack:astro": 2,
+    "stack:avalonia": 2,
+    "stack:blazor": 2,
+    "stack:flutter": 2,
+    "stack:html-tailwind": 2,
+    "stack:javafx": 2,
+    "stack:jetpack-compose": 2,
+    "stack:laravel": 2,
+    "stack:nextjs": 2,
+    "stack:nuxt-ui": 2,
+    "stack:nuxtjs": 2,
+    "stack:react": 2,
+    "stack:react-native": 2,
+    "stack:shadcn": 2,
+    "stack:svelte": 2,
+    "stack:swiftui": 2,
+    "stack:threejs": 2,
+    "stack:uno": 2,
+    "stack:uwp": 2,
+    "stack:vue": 2,
+    "stack:winui": 2,
+    "stack:wpf": 2,
+    "typo": 5
+  },
+  "splits": {
+    "calibration": {
+      "metrics": {
+        "designSystemCoherence": {
+          "floor": 1.0,
+          "tolerance": 1e-12
+        },
+        "mrrAt3": {
+          "floor": 0.9333333333333333,
+          "tolerance": 1e-12
+        },
+        "ndcgAt3": {
+          "floor": 0.9202954344299588,
+          "tolerance": 1e-12
+        },
+        "negativeAbstention": {
+          "floor": 1.0,
+          "tolerance": 1e-12
+        },
+        "precisionAt1": {
+          "floor": 0.9,
+          "tolerance": 1e-12
+        },
+        "precisionAt3": {
+          "floor": 0.4,
+          "tolerance": 1e-12
+        },
+        "routingAccuracy": {
+          "floor": 1.0,
+          "tolerance": 1e-12
+        },
+        "typoRecoveryAt3": {
+          "floor": 0.0,
+          "tolerance": 1e-12
+        }
+      },
+      "sampleMinimums": {
+        "cases": 47,
+        "designSystem": 4,
+        "negativeChecks": 105,
+        "retrieval": 40,
+        "routing": 5,
+        "typo": 0
+      }
+    },
+    "held_out": {
+      "metrics": {
+        "designSystemCoherence": {
+          "floor": 1.0,
+          "tolerance": 1e-12
+        },
+        "mrrAt3": {
+          "floor": 0.8070175438596492,
+          "tolerance": 1e-12
+        },
+        "ndcgAt3": {
+          "floor": 0.8030838558879088,
+          "tolerance": 1e-12
+        },
+        "negativeAbstention": {
+          "floor": 0.9523809523809523,
+          "tolerance": 1e-12
+        },
+        "precisionAt1": {
+          "floor": 0.7368421052631579,
+          "tolerance": 1e-12
+        },
+        "precisionAt3": {
+          "floor": 0.35964912280701755,
+          "tolerance": 1e-12
+        },
+        "routingAccuracy": {
+          "floor": 1.0,
+          "tolerance": 1e-12
+        },
+        "typoRecoveryAt3": {
+          "floor": 1.0,
+          "tolerance": 1e-12
+        }
+      },
+      "sampleMinimums": {
+        "cases": 45,
+        "designSystem": 4,
+        "negativeChecks": 105,
+        "retrieval": 38,
+        "routing": 3,
+        "typo": 5
+      }
+    }
+  },
+  "lockedCases": {
+    "domain-style-glassmorphism": {
+      "withinTop": 1,
+      "minimumGrade": 2
+    },
+    "domain-color-spa": {
+      "withinTop": 1,
+      "minimumGrade": 2
+    },
+    "domain-chart-time-series": {
+      "withinTop": 1,
+      "minimumGrade": 2
+    },
+    "domain-landing-pricing": {
+      "withinTop": 1,
+      "minimumGrade": 2
+    },
+    "domain-product-spa": {
+      "withinTop": 1,
+      "minimumGrade": 2
+    },
+    "domain-ux-keyboard-focus": {
+      "withinTop": 1,
+      "minimumGrade": 2
+    },
+    "domain-typography-luxury": {
+      "withinTop": 1,
+      "minimumGrade": 2
+    },
+    "domain-icons-search": {
+      "withinTop": 1,
+      "minimumGrade": 2
+    },
+    "domain-gsap-scroll-reveal": {
+      "withinTop": 1,
+      "minimumGrade": 2
+    },
+    "domain-react-parallel-promises": {
+      "withinTop": 1,
+      "minimumGrade": 2
+    },
+    "domain-web-icon-label": {
+      "withinTop": 1,
+      "minimumGrade": 2
+    },
+    "domain-google-fonts-inter": {
+      "withinTop": 1,
+      "minimumGrade": 2
+    },
+    "stack-swiftui-navigation": {
+      "withinTop": 1,
+      "minimumGrade": 2
+    },
+    "stack-threejs-orbitcontrols": {
+      "withinTop": 1,
+      "minimumGrade": 2
+    },
+    "stack-uwp-migration": {
+      "withinTop": 1,
+      "minimumGrade": 2
+    },
+    "stack-winui-dispatcherqueue": {
+      "withinTop": 1,
+      "minimumGrade": 2
+    },
+    "stack-blazor-render-mode": {
+      "withinTop": 1,
+      "minimumGrade": 2
+    },
+    "stack-blazor-mudtheme": {
+      "withinTop": 1,
+      "minimumGrade": 2
+    }
+  },
+  "proposedFinalTargets": {
+    "routingAccuracy": 0.93,
+    "precisionAt1": 0.8,
+    "mrrAt3": 0.88,
+    "ndcgAt3": 0.92,
+    "negativeAbstention": 0.95,
+    "typoRecoveryAt3": 0.85,
+    "designSystemCoherence": 0.9
+  }
+}

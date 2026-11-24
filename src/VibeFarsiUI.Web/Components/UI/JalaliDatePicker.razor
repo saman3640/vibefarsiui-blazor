@@ -1,0 +1,114 @@
+@* Ported from registry/ui/jalali-calendar.tsx — Saturday-first month grid, today and holidays. *@
+<div class="vf-cal @Class" aria-label="تقویم شمسی">
+    <div class="vf-cal__head">
+        <button type="button" class="vf-cal__nav" aria-label="ماه قبل" @onclick="() => MoveMonth(-1)">
+            <LucideIcon Name="chevron-right" Size="16" />
+        </button>
+        <span class="vf-cal__title">@CalendarMath.MonthTitle(_jy, _jm)</span>
+        <button type="button" class="vf-cal__nav" aria-label="ماه بعد" @onclick="() => MoveMonth(1)">
+            <LucideIcon Name="chevron-left" Size="16" />
+        </button>
+    </div>
+
+    <div class="vf-cal__grid" role="grid">
+        @foreach (var name in JalaliCalendar.WeekdayShortNames)
+        {
+            <span class="vf-cal__weekday" role="columnheader">@name</span>
+        }
+        @foreach (var week in CalendarMath.MonthGrid(_jy, _jm))
+        {
+            @foreach (var day in week)
+            {
+                var current = day.Date;
+                var jalali = JalaliCalendar.ToJalali(current);
+                var outside = jalali.Month != _jm;
+                var selected = Value is not null && CalendarMath.IsSameDay(Value, current);
+                var today = CalendarMath.IsSameDay(DateTime.Today, current);
+                var friday = JalaliCalendar.Weekday(current) == 6;
+                var disabled = (Min is not null && current < Min.Value.Date) || (Max is not null && current > Max.Value.Date);
+                <button type="button"
+                        class="vf-cal__day"
+                        role="gridcell"
+                        disabled="@disabled"
+                        data-outside="@(outside ? "true" : "false")"
+                        data-selected="@(selected ? "true" : "false")"
+                        data-today="@(today ? "true" : "false")"
+                        data-holiday="@(friday && !outside ? "true" : "false")"
+                        aria-label="@JalaliCalendar.Format(current, weekday: true)"
+                        aria-pressed="@(selected ? "true" : "false")"
+                        @onclick="() => SelectAsync(current)">@PersianText.Fa(jalali.Day)</button>
+            }
+        }
+    </div>
+
+    <div class="vf-cal__note">
+        @if (Value is null)
+        {
+            <span>یک روز را انتخاب کنید</span>
+        }
+        else
+        {
+            <span>@JalaliCalendar.Format(Value.Value, weekday: true)</span>
+        }
+    </div>
+
+    @if (ShowToday)
+    {
+        <div style="text-align:center;margin-top:.5rem">
+            <button type="button" class="vf-btn vf-btn--ghost vf-btn--sm" @onclick="() => SelectAsync(DateTime.Today)">برو به امروز</button>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public DateTime? Value { get; set; }
+    [Parameter] public EventCallback<DateTime?> ValueChanged { get; set; }
+    [Parameter] public DateTime? Min { get; set; }
+    [Parameter] public DateTime? Max { get; set; }
+    [Parameter] public bool ShowToday { get; set; } = true;
+    [Parameter] public string? Class { get; set; }
+
+    private int _jy;
+    private int _jm;
+    private DateTime? _observedValue;
+
+    protected override void OnParametersSet()
+    {
+        if (_jy == 0)
+        {
+            var initial = Value?.Date ?? DateTime.Today;
+            var jalali = JalaliCalendar.ToJalali(initial);
+            _jy = jalali.Year;
+            _jm = jalali.Month;
+            _observedValue = Value;
+            return;
+        }
+
+        // Only follow Value when the bound value actually changed. A parent
+        // re-render must not snap the calendar back from the month the user
+        // navigated to.
+        if (Value == _observedValue) return;
+        _observedValue = Value;
+        if (Value is null) return;
+        var selected = JalaliCalendar.ToJalali(Value.Value);
+        _jy = selected.Year;
+        _jm = selected.Month;
+    }
+
+    private void MoveMonth(int delta)
+    {
+        var total = _jy * 12 + (_jm - 1) + delta;
+        _jy = total / 12;
+        _jm = total % 12 + 1;
+    }
+
+    private async Task SelectAsync(DateTime date)
+    {
+        Value = date.Date;
+        _observedValue = Value;
+        var jalali = JalaliCalendar.ToJalali(date);
+        _jy = jalali.Year;
+        _jm = jalali.Month;
+        await ValueChanged.InvokeAsync(Value);
+    }
+}

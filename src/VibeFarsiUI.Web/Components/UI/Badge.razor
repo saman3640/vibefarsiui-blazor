@@ -1,0 +1,12 @@
+@* Ported from registry/ui/badge.tsx. *@
+<span class="@Classes" @attributes="AdditionalAttributes">@ChildContent</span>
+
+@code {
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public string Variant { get; set; } = "default";
+    [Parameter] public bool Solid { get; set; }
+    [Parameter] public string? Class { get; set; }
+    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private string Classes => Css.Join("vf-badge", $"vf-badge--{Variant}", Solid ? "vf-badge--solid" : null, Class);
+}

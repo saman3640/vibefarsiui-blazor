@@ -1,0 +1,32 @@
+@* Ported from registry/ui/accordion.tsx — parent coordinates the open item. *@
+<div class="vf-acc @Class">
+    <CascadingValue Value="this" IsFixed="true">
+        @ChildContent
+    </CascadingValue>
+</div>
+
+@code {
+    private readonly List<AccordionItem> _items = [];
+
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public bool Multiple { get; set; }
+    [Parameter] public string? Class { get; set; }
+
+    internal void Register(AccordionItem item)
+    {
+        if (!_items.Contains(item)) _items.Add(item);
+    }
+
+    internal void Unregister(AccordionItem item) => _items.Remove(item);
+
+    internal void Toggle(AccordionItem item)
+    {
+        var opening = !item.Open;
+        if (!Multiple)
+        {
+            foreach (var other in _items) other.SetOpen(false);
+        }
+        item.SetOpen(opening);
+        StateHasChanged();
+    }
+}

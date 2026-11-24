@@ -50,3 +50,11 @@ __pycache__/
 # Claude Code / Cursor (local)
 .claude/
 .cursor/
+
+# .NET / Blazor
+**/bin/
+**/obj/
+.vs/
+*.user
+*.suo
+.tmp/

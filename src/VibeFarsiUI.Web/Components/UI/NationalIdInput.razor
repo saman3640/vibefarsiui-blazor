@@ -1,0 +1,60 @@
+@* Ported from registry/ui/national-id-input.tsx — 3-6-1 grouping and legal checksum. *@
+<div class="vf-field">
+    @if (!string.IsNullOrEmpty(Label))
+    {
+        <label class="vf-label" for="@Id">@Label</label>
+    }
+    <div class="vf-input-wrap" data-invalid="@(ShowError ? "true" : null)">
+        <LucideIcon Name="hash" Size="16" Class="vf-muted" />
+        <input id="@Id"
+               class="vf-input"
+               type="text"
+               dir="ltr"
+               inputmode="numeric"
+               maxlength="12"
+               value="@_display"
+               placeholder="001 234 567 8"
+               aria-invalid="@(ShowError ? "true" : null)"
+               @oninput="OnInputAsync" />
+        @if (IranianValidation.IsNationalId(Value))
+        {
+            <LucideIcon Name="check-circle" Size="16" />
+        }
+    </div>
+    @if (ShowError)
+    {
+        <span class="vf-error" role="alert">کد ملی معتبر نیست.</span>
+    }
+    else if (!string.IsNullOrEmpty(Hint))
+    {
+        <span class="vf-hint">@Hint</span>
+    }
+</div>
+
+@code {
+    [Parameter] public string? Value { get; set; }
+    [Parameter] public EventCallback<string?> ValueChanged { get; set; }
+    [Parameter] public string? Label { get; set; } = "کد ملی";
+    [Parameter] public string? Hint { get; set; }
+    [Parameter] public string? Id { get; set; } = $"vf-nid-{Guid.NewGuid():N}";
+    [Parameter] public bool ShowValidation { get; set; } = true;
+
+    private string _display = string.Empty;
+
+    protected override void OnParametersSet() => _display = Format(IranianValidation.NormalizeNationalId(Value));
+
+    private bool ShowError => ShowValidation && !string.IsNullOrEmpty(Value) && !IranianValidation.IsNationalId(Value);
+
+    private async Task OnInputAsync(ChangeEventArgs args)
+    {
+        Value = IranianValidation.NormalizeNationalId(args.Value?.ToString());
+        _display = Format(Value);
+        await ValueChanged.InvokeAsync(Value);
+    }
+
+    private static string Format(string digits)
+    {
+        var parts = new[] { digits.Length > 3 ? digits[..3] : digits, digits.Length > 3 ? (digits.Length > 9 ? digits[3..9] : digits[3..]) : "", digits.Length > 9 ? digits[9..] : "" };
+        return PersianText.Fa(string.Join(' ', parts.Where(p => p.Length > 0)));
+    }
+}

@@ -1,0 +1,86 @@
+@page "/components"
+@inject IRegistryProvider Registry
+@using VibeFarsiUI.Web.Catalog
+
+<PageTitle>کامپوننت‌ها — وایب‌فارسی</PageTitle>
+<HeadContent>
+    <meta name="description" content="کاوش ۱۰۸ کامپوننت فارسی و راست‌چین برای Blazor؛ فرم، نمایش داده، بازخورد، ناوبری و هوش مصنوعی." />
+    <link rel="canonical" href="@($"{BaseUrl}/components")" />
+</HeadContent>
+
+<header class="doc-header" style="margin-bottom:1.5rem">
+    <div>
+        <span class="hero__eyebrow">@PersianText.Fa(All.Count) کامپوننت</span>
+        <h1>کامپوننت‌های فارسی Blazor</h1>
+        <p>
+            کامپوننت‌های بومی با پیش‌نمایش زنده، پارامترهای مستند و سورس کامل.
+            موارد دارای نشان «بومی» در Blazor پیاده‌سازی شده‌اند.
+        </p>
+    </div>
+</header>
+
+<div class="search-row">
+    <SearchInput @bind-Value="_query" Placeholder="جست‌وجو بر اساس نام، تگ یا توضیح…" AriaLabel="جست‌وجوی کامپوننت" />
+    <Badge Variant="secondary">@PersianText.Fa(Filtered.Count) نتیجه</Badge>
+</div>
+
+<div class="chip-row" style="margin-bottom:1.5rem">
+    @foreach (var category in Categories)
+    {
+        <button type="button"
+                class="chip"
+                aria-pressed="@(category.Key == _category ? "true" : "false")"
+                @onclick="() => _category = category.Key">
+            @category.Label
+            <span class="vf-muted">@PersianText.Fa(category.Count)</span>
+        </button>
+    }
+</div>
+
+@if (Filtered.Count == 0)
+{
+    <EmptyState Title="کامپوننتی پیدا نشد" Description="عبارت دیگری را جست‌وجو کنید یا دسته را تغییر دهید.">
+        <Button Variant="outline" Size="sm" @onclick="ResetAsync">پاک کردن فیلترها</Button>
+    </EmptyState>
+}
+else
+{
+    <div class="grid">
+        @foreach (var item in Filtered)
+        {
+            <ComponentCard Item="item" />
+        }
+    </div>
+}
+
+@code {
+    [Inject] private IConfiguration Configuration { get; set; } = default!;
+
+    private string? _query;
+    private string _category = "all";
+
+    private string BaseUrl => Configuration["Site:Url"] ?? "https://vibefarsi.ir";
+
+    private IReadOnlyList<RegistryItemSummary> All => Registry.BySection("components");
+
+    private IReadOnlyList<CategoryInfo> Categories => Registry.ComponentCategories;
+
+    private IReadOnlyList<RegistryItemSummary> Filtered
+    {
+        get
+        {
+            var items = string.IsNullOrWhiteSpace(_query)
+                ? All
+                : Registry.Search(_query, "component", 200);
+            if (_category != "all")
+                items = items.Where(i => string.Equals(i.Category, _category, StringComparison.OrdinalIgnoreCase)).ToList();
+            return items;
+        }
+    }
+
+    private void ResetAsync()
+    {
+        _query = null;
+        _category = "all";
+    }
+}

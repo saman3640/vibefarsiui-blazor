@@ -1,0 +1,26 @@
+@using VibeFarsiUI.Web.Catalog
+
+<a class="catalog-card" href="/@Item.SectionPath/@Item.Slug">
+    <div class="vf-row" style="justify-content:space-between">
+        <h3>@Item.Name</h3>
+        @if (MigratedComponents.TryGet(Item.Slug, out _))
+        {
+            <Badge Variant="success">بومی</Badge>
+        }
+    </div>
+    <p>@Item.Desc</p>
+    <div class="catalog-card__meta">
+        <span class="catalog-card__slug">@Item.Slug</span>
+        <span>·</span>
+        <span>@Item.PersianType</span>
+        @if (!string.IsNullOrEmpty(Item.Category))
+        {
+            <span>·</span>
+            <span>@Item.Category</span>
+        }
+    </div>
+</a>
+
+@code {
+    [Parameter, EditorRequired] public RegistryItemSummary Item { get; set; } = default!;
+}

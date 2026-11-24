@@ -1,0 +1,20 @@
+@* Ported from registry/ui/separator.tsx. *@
+@if (Vertical)
+{
+    <span class="vf-sep vf-sep--vertical @Class" role="separator" aria-orientation="vertical" @attributes="AdditionalAttributes"></span>
+}
+else if (!string.IsNullOrEmpty(Label))
+{
+    <div class="vf-divider-label @Class" role="separator">@Label</div>
+}
+else
+{
+    <hr class="vf-sep @Class" role="separator" @attributes="AdditionalAttributes" />
+}
+
+@code {
+    [Parameter] public bool Vertical { get; set; }
+    [Parameter] public string? Label { get; set; }
+    [Parameter] public string? Class { get; set; }
+    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+}

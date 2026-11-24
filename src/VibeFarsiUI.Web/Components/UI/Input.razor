@@ -1,0 +1,48 @@
+@* Ported from registry/ui/input.tsx — addons, error state, LTR mode for phone/email. *@
+<div class="vf-input-wrap" data-invalid="@(!string.IsNullOrEmpty(Error) ? "true" : null)">
+    @if (StartAddon is not null)
+    {
+        <span class="vf-addon">@StartAddon</span>
+    }
+    <input id="@Id"
+           class="vf-input @Class"
+           type="@Type"
+           dir="@Dir"
+           value="@Value"
+           placeholder="@Placeholder"
+           disabled="@Disabled"
+           inputmode="@InputMode"
+           maxlength="@MaxLength"
+           autocomplete="@AutoComplete"
+           aria-invalid="@(!string.IsNullOrEmpty(Error) ? "true" : null)"
+           @oninput="OnInputAsync"
+           @attributes="AdditionalAttributes" />
+    @if (EndAddon is not null)
+    {
+        <span class="vf-addon">@EndAddon</span>
+    }
+</div>
+
+@code {
+    [Parameter] public string? Value { get; set; }
+    [Parameter] public EventCallback<string?> ValueChanged { get; set; }
+    [Parameter] public string? Id { get; set; }
+    [Parameter] public string Type { get; set; } = "text";
+    [Parameter] public string? Dir { get; set; }
+    [Parameter] public string? Placeholder { get; set; }
+    [Parameter] public string? Error { get; set; }
+    [Parameter] public bool Disabled { get; set; }
+    [Parameter] public string? InputMode { get; set; }
+    [Parameter] public int? MaxLength { get; set; }
+    [Parameter] public string? AutoComplete { get; set; }
+    [Parameter] public RenderFragment? StartAddon { get; set; }
+    [Parameter] public RenderFragment? EndAddon { get; set; }
+    [Parameter] public string? Class { get; set; }
+    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private async Task OnInputAsync(ChangeEventArgs args)
+    {
+        Value = args.Value?.ToString();
+        await ValueChanged.InvokeAsync(Value);
+    }
+}

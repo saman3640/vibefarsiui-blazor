@@ -1,0 +1,96 @@
+@* Ported from registry/ui/otp-field.tsx — LTR cells, auto advance, Persian input accepted. *@
+<div class="vf-field">
+    @if (!string.IsNullOrEmpty(Label))
+    {
+        <span class="vf-label">@Label</span>
+    }
+    <div class="vf-otp" dir="ltr" role="group" aria-label="@(Label ?? "کد یک‌بار مصرف")">
+        @for (var i = 0; i < Length; i++)
+        {
+            var index = i;
+            <input type="text"
+                   inputmode="numeric"
+                   autocomplete="one-time-code"
+                   maxlength="1"
+                   id="@($"{Id}-{index}")"
+                   aria-label="@($"رقم {PersianText.Fa(index + 1)}")"
+                   value="@CharAt(index)"
+                   disabled="@Disabled"
+                   @oninput="args => OnInputAsync(args, index)"
+                   @onkeydown="args => OnKeyDownAsync(args, index)" />
+        }
+    </div>
+    @if (!string.IsNullOrEmpty(Hint))
+    {
+        <span class="vf-hint">@Hint</span>
+    }
+</div>
+
+@code {
+    [Parameter] public string? Value { get; set; }
+    [Parameter] public EventCallback<string?> ValueChanged { get; set; }
+    [Parameter] public EventCallback<string> OnComplete { get; set; }
+    [Parameter] public int Length { get; set; } = 6;
+    [Parameter] public string? Label { get; set; }
+    [Parameter] public string? Hint { get; set; }
+    [Parameter] public string Id { get; set; } = $"vf-otp-{Guid.NewGuid():N}";
+    [Parameter] public bool Disabled { get; set; }
+
+    private char[] _buffer = new char[6];
+
+    protected override void OnParametersSet()
+    {
+        if (_buffer.Length != Length) _buffer = new char[Length];
+        var value = PersianText.En(Value);
+        for (var i = 0; i < Length; i++)
+            _buffer[i] = i < value.Length && char.IsDigit(value[i]) ? value[i] : '\0';
+    }
+
+    private string CharAt(int index)
+        => _buffer[index] == '\0' ? string.Empty : PersianText.Fa(_buffer[index].ToString());
+
+    private async Task OnInputAsync(ChangeEventArgs args, int index)
+    {
+        var digits = PersianText.En(args.Value?.ToString()).Where(char.IsDigit).ToArray();
+        _buffer[index] = digits.Length > 0 ? digits[0] : '\0';
+        await EmitAsync();
+        if (digits.Length > 0 && index < Length - 1)
+            await FocusAsync(index + 1);
+    }
+
+    private async Task OnKeyDownAsync(KeyboardEventArgs args, int index)
+    {
+        if (args.Key == "Backspace" && _buffer[index] == '\0' && index > 0)
+        {
+            _buffer[index - 1] = '\0';
+            await EmitAsync();
+            await FocusAsync(index - 1);
+        }
+        else if (args.Key == "ArrowLeft" && index > 0)
+        {
+            await FocusAsync(index - 1);
+        }
+        else if (args.Key == "ArrowRight" && index < Length - 1)
+        {
+            await FocusAsync(index + 1);
+        }
+    }
+
+    private async Task EmitAsync()
+    {
+        Value = new string(_buffer.Where(c => c != '\0').ToArray());
+        await ValueChanged.InvokeAsync(Value);
+        if (Value.Length == Length) await OnComplete.InvokeAsync(Value);
+    }
+
+    [Inject] private IJSRuntime JS { get; set; } = default!;
+
+    private async Task FocusAsync(int index)
+    {
+        try
+        {
+            await JS.InvokeVoidAsync("vfFocus", $"{Id}-{index}");
+        }
+        catch (JSDisconnectedException) { }
+    }
+}

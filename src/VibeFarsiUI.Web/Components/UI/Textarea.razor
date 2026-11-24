@@ -1,0 +1,46 @@
+@* Ported from registry/ui/textarea.tsx. *@
+<div class="vf-field">
+    @if (!string.IsNullOrEmpty(Label))
+    {
+        <label class="vf-label" for="@Id">@Label</label>
+    }
+    <div class="vf-input-wrap">
+        <textarea id="@Id"
+                  class="vf-input vf-textarea"
+                  placeholder="@Placeholder"
+                  disabled="@Disabled"
+                  maxlength="@MaxLength"
+                  rows="@Rows"
+                  value="@Value"
+                  @oninput="OnInputAsync"
+                  @attributes="AdditionalAttributes"></textarea>
+    </div>
+    @if (ShowCount && MaxLength is not null)
+    {
+        <span class="vf-count">@PersianText.Fa($"{_length} / {MaxLength}")</span>
+    }
+</div>
+
+@code {
+    [Parameter] public string? Value { get; set; }
+    [Parameter] public EventCallback<string?> ValueChanged { get; set; }
+    [Parameter] public string? Id { get; set; }
+    [Parameter] public string? Label { get; set; }
+    [Parameter] public string? Placeholder { get; set; }
+    [Parameter] public int? MaxLength { get; set; }
+    [Parameter] public int Rows { get; set; } = 4;
+    [Parameter] public bool ShowCount { get; set; }
+    [Parameter] public bool Disabled { get; set; }
+    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private int _length;
+
+    protected override void OnParametersSet() => _length = Value?.Length ?? 0;
+
+    private async Task OnInputAsync(ChangeEventArgs args)
+    {
+        Value = args.Value?.ToString();
+        _length = Value?.Length ?? 0;
+        await ValueChanged.InvokeAsync(Value);
+    }
+}

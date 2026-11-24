@@ -1,0 +1,160 @@
+@page "/"
+@inject IRegistryProvider Registry
+@using VibeFarsiUI.Web.Catalog
+
+<PageTitle>وایب‌فارسی — کامپوننت‌های فارسی Blazor</PageTitle>
+<HeadContent>
+    <meta name="description" content="کامپوننت‌های فارسی و راست‌چین برای Blazor: تقویم شمسی، اعداد فارسی، تومان و شش سیستم طراحی." />
+    <link rel="canonical" href="@($"{BaseUrl}/")" />
+</HeadContent>
+
+<section class="hero">
+    <span class="hero__eyebrow"><LucideIcon Name="sparkles" Size="14" /> نسخه‌ی .NET 10 Blazor</span>
+    <h1>کامپوننت‌های فارسی، از پایه راست‌چین.</h1>
+    <p>
+        همان اکوسیستم وایب‌فارسی، این بار با Razor و C#. تقویم شمسی، اعداد فارسی، تومان،
+        شش سیستم طراحی و صدها کامپوننت، بلاک، نمودار و قالب — بدون وابستگی به React.
+    </p>
+    <div class="hero__actions">
+        <a class="vf-btn vf-btn--default" href="/components">کاوش کامپوننت‌ها</a>
+        <a class="vf-btn vf-btn--outline" href="/docs">شروع با Blazor</a>
+        <CopyButton Text="dotnet add package VibeFarsiUI" Label="کپی دستور نصب" />
+    </div>
+    <div class="vf-row" style="margin-top:1.5rem">
+        <Badge Variant="secondary">@PersianText.Fa(Registry.Items.Count) آیتم رجیستری</Badge>
+        <Badge Variant="secondary">@PersianText.Fa(MigratedComponents.Count) کامپوننت بومی</Badge>
+        <Badge Variant="secondary">۶ سیستم طراحی</Badge>
+        <Badge Variant="secondary">Vazirmatn + IRANSans</Badge>
+    </div>
+</section>
+
+<section class="section">
+    <div class="section__head">
+        <div>
+            <h2>چرا فارسی‌محور؟</h2>
+            <p>تصمیم‌های طراحی از روز اول برای فارسی گرفته شده‌اند، نه وصله‌شده.</p>
+        </div>
+    </div>
+    <div class="grid">
+        <div class="catalog-card">
+            <LucideIcon Name="calendar" Size="22" />
+            <h3>تقویم شمسی واقعی</h3>
+            <p>تبدیل دقیق جلالی/میلادی، شنبه به‌عنوان اول هفته، تعطیلی جمعه و نمایش ماهانه.</p>
+        </div>
+        <div class="catalog-card">
+            <LucideIcon Name="hash" Size="22" />
+            <h3>اعداد و تومان</h3>
+            <p>تبدیل رقم فارسی، جداکننده هزارگان، قالب‌بندی تومان و اعتبارسنجی کد ملی و موبایل.</p>
+        </div>
+        <div class="catalog-card">
+            <LucideIcon Name="layers" Size="22" />
+            <h3>RTL منطقی</h3>
+            <p>ویژگی‌های منطقی CSS به‌جای left/right؛ آیکون‌ها، منوها و جدول‌ها درست می‌چرخند.</p>
+        </div>
+        <div class="catalog-card">
+            <LucideIcon Name="palette" Size="22" />
+            <h3>شش سیستم طراحی</h3>
+            <p>گرافیت، فیروزه، زعفران، انار، لاجورد و کاغذ — با CSS variables و تغییر بدون رفرش.</p>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="section__head">
+        <div>
+            <h2>کامپوننت‌های بومی</h2>
+            <p>پیاده‌سازی‌های واقعی Blazor با پیش‌نمایش زنده و پارامترهای مستند.</p>
+        </div>
+        <a class="section__link" href="/components">همه‌ی کامپوننت‌ها ←</a>
+    </div>
+    <div class="grid">
+        @foreach (var item in Featured)
+        {
+            <ComponentCard Item="item" />
+        }
+    </div>
+</section>
+
+<section class="section">
+    <div class="section__head">
+        <div>
+            <h2>اکوسیستم کامل</h2>
+            <p>همان دارایی‌های اصلی، با متادیتای یکسان رجیستری.</p>
+        </div>
+    </div>
+    <div class="grid">
+        @foreach (var section in Sections)
+        {
+            <a class="catalog-card" href="/@section.Path">
+                <div class="vf-row" style="justify-content:space-between">
+                    <h3>@section.Label</h3>
+                    <Badge Variant="secondary">@PersianText.Fa(section.Count)</Badge>
+                </div>
+                <p>@section.Description</p>
+            </a>
+        }
+    </div>
+</section>
+
+<section class="section">
+    <div class="section__head">
+        <div>
+            <h2>تم‌ها</h2>
+            <p>رنگ‌ها، شعاع، سایه و تایپوگرافی از طریق توکن‌های CSS.</p>
+        </div>
+        <a class="section__link" href="/themes">تنظیم تم ←</a>
+    </div>
+    <div class="theme-grid">
+        @foreach (var theme in Themes)
+        {
+            <div class="theme-card" data-theme="@theme.Key">
+                <div class="theme-card__swatches">
+                    <span class="theme-card__swatch" style="background:var(--brand)"></span>
+                    <span class="theme-card__swatch" style="background:var(--accent)"></span>
+                    <span class="theme-card__swatch" style="background:var(--background)"></span>
+                    <span class="theme-card__swatch" style="background:var(--foreground)"></span>
+                </div>
+                <h3>@theme.Label</h3>
+                <p>@theme.Description</p>
+            </div>
+        }
+    </div>
+</section>
+
+@code {
+    [Inject] private IConfiguration Configuration { get; set; } = default!;
+
+    private string BaseUrl => Configuration["Site:Url"] ?? "https://vibefarsi.ir";
+
+    private IReadOnlyList<RegistryItemSummary> Featured => new[] { "button", "phone-input", "date-picker", "price", "accordion", "stat" }
+        .Select(slug => Registry.FindBySlug(slug))
+        .Where(item => item is not null)
+        .Select(item => item!)
+        .ToList();
+
+    private sealed record SectionLink(string Path, string Label, string Description, int Count);
+
+    private IReadOnlyList<SectionLink> Sections =>
+    [
+        new("blocks", "بلاک‌ها", "بخش‌های آماده‌ی صفحه مثل هدر، جدول و داشبورد.", Registry.BySection("blocks").Count),
+        new("charts", "نمودارها", "نمودارهای سبک با SVG و توکن‌های تم.", Registry.BySection("charts").Count),
+        new("calendar", "تقویم", "نماها، برنامه‌ریزی و مناسبت‌های شمسی.", Registry.BySection("calendar").Count),
+        new("animations", "انیمیشن‌ها", "ریزحرکت‌های CSS با احترام به reduced-motion.", Registry.BySection("animations").Count),
+        new("backgrounds", "پس‌زمینه‌ها", "بافت‌ها و گرادیان‌های فارسی‌پسند.", Registry.BySection("backgrounds").Count),
+        new("templates", "قالب‌ها", "صفحات کامل برای محصول، فروشگاه و داشبورد.", Registry.BySection("templates").Count),
+        new("themes", "تم‌ها", "شش سیستم طراحی با توکن‌های مشترک.", Registry.BySection("themes").Count),
+        new("skills", "مهارت‌ها", "پرامپت‌ها و راهنماهای هوش مصنوعی.", Registry.BySection("skills").Count)
+    ];
+
+    private sealed record ThemeCard(string Key, string Label, string Description);
+
+    private static readonly ThemeCard[] Themes =
+    [
+        new("graphite", "گرافیت", "تیره، خنثی و مینیمال"),
+        new("turquoise", "فیروزه", "سبز-آبی الهام‌گرفته از کاشی"),
+        new("saffron", "زعفران", "گرم و ادویه‌ای"),
+        new("pomegranate", "انار", "قرمز عمیق و پرانرژی"),
+        new("lapis", "لاجورد", "آبی اصیل ایرانی"),
+        new("paper", "کاغذ", "روشن و آرام برای مطالعه")
+    ];
+}

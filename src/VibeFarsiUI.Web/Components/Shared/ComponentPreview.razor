@@ -1,0 +1,306 @@
+@* Live demos for migrated registry slugs. Components not listed here show an
+   explicit migration notice instead of a mock-up. *@
+<div class="vf-demo-wrap">
+    @switch (Slug)
+    {
+        case "button":
+            <div class="vf-row">
+                <Button>ذخیره</Button>
+                <Button Variant="secondary">ثانویه</Button>
+                <Button Variant="outline">دور‌خط</Button>
+                <Button Variant="ghost">بی‌رنگ</Button>
+                <Button Variant="brand"><LucideIcon Name="sparkles" Size="15" /> هوش مصنوعی</Button>
+                <Button Variant="destructive">حذف</Button>
+            </div>
+            <div class="vf-row">
+                <Button Size="sm">کوچک</Button>
+                <Button Size="lg">بزرگ</Button>
+                <Button Variant="outline" Size="icon" aria-label="افزودن"><LucideIcon Name="plus" Size="16" /></Button>
+                <Button Disabled>غیرفعال</Button>
+            </div>
+            break;
+
+        case "input":
+            <div class="vf-demo-grid">
+                <Field Label="نام و نام خانوادگی" Hint="همان‌طور که در کارت ملی است.">
+                    <Input @bind-Value="_name" Placeholder="مثلاً سارا احمدی" />
+                </Field>
+                <Field Label="ایمیل" Error="ایمیل معتبر نیست.">
+                    <Input Type="email" Dir="ltr" Value="sara@example.com" Error="ایمیل معتبر نیست." />
+                </Field>
+            </div>
+            break;
+
+        case "textarea":
+            <Field Label="یادداشت">
+                <Textarea @bind-Value="_note" Placeholder="توضیح کوتاه…" ShowCount MaxLength="180" />
+            </Field>
+            break;
+
+        case "select":
+            <Select @bind-Value="_city" Label="شهر" Options="_cities" />
+            break;
+
+        case "otp-field":
+            <div class="vf-stack">
+                <OtpField @bind-Value="_otp" Label="کد تأیید" />
+                <span class="vf-hint">مقدار: @(string.IsNullOrEmpty(_otp) ? "—" : PersianText.Fa(_otp))</span>
+            </div>
+            break;
+
+        case "number-field":
+            <NumberField @bind-Value="_count" Min="1" Max="10" Label="تعداد" Hint="بین ۱ تا ۱۰" />
+            break;
+
+        case "checkbox-group":
+            <div class="vf-stack">
+                <Checkbox @bind-Checked="_terms" Label="قوانین را می‌پذیرم" Description="برای ادامه لازم است." />
+                <Checkbox @bind-Checked="_newsletter" Label="خبرنامه" Description="هفته‌ای یک ایمیل." />
+            </div>
+            break;
+
+        case "radio-group":
+            <RadioGroup @bind-Value="_plan" Options="_plans" Label="نوع اشتراک" />
+            break;
+
+        case "switch":
+            <div class="vf-stack" style="max-width:24rem">
+                <Switch @bind-Checked="_switch" Label="اعلان پیامک" Description="فقط سفارش‌های مهم" />
+            </div>
+            break;
+
+        case "rating":
+            <div class="vf-row">
+                <Rating @bind-Value="_rating" ShowValue />
+                <span class="vf-muted">@PersianText.Fa(_rating) از ۵</span>
+            </div>
+            break;
+
+        case "tooltip":
+            <div class="vf-row" style="padding-block:1.5rem">
+                <Tooltip Text="کپی در حافظه">
+                    <Button Variant="outline" Size="sm"><LucideIcon Name="copy" Size="14" /> نگه دارید</Button>
+                </Tooltip>
+            </div>
+            break;
+
+        case "tabs":
+            <Tabs Items="_tabs" @bind-Active="_active">
+                <ActiveContent Context="tab">
+                    <p class="vf-muted">محتوای تب «@tab»</p>
+                </ActiveContent>
+            </Tabs>
+            break;
+
+        case "pagination":
+            <Pagination @bind-Page="_page" PageCount="9" />
+            break;
+
+        case "breadcrumb":
+            <Breadcrumb Items="_crumbs" />
+            break;
+
+        case "alert":
+            <div class="vf-stack">
+                <Alert Variant="success" Title="ذخیره شد">تغییرات شما با موفقیت ثبت شد.</Alert>
+                <Alert Variant="warning" Title="توجه">این عمل قابل بازگشت نیست.</Alert>
+                <Alert Variant="destructive" Title="خطا">اتصال به سرور برقرار نشد.</Alert>
+            </div>
+            break;
+
+        case "progress":
+            <div class="vf-stack" style="max-width:24rem">
+                <Progress Value="72" Label="پیشرفت آپلود" ShowValue />
+            </div>
+            break;
+
+        case "skeleton":
+            <div class="vf-stack" style="max-width:24rem">
+                <Skeleton Height="1rem" Width="55%" />
+                <Skeleton Height="1rem" Width="90%" />
+                <Skeleton Height="4rem" />
+            </div>
+            break;
+
+        case "empty-state":
+            <EmptyState Title="سفارشی پیدا نشد" Description="فیلترها را تغییر دهید یا سفارش جدید بسازید.">
+                <Button Size="sm" Variant="outline">سفارش جدید</Button>
+            </EmptyState>
+            break;
+
+        case "badge":
+            <div class="vf-row">
+                <Badge>پیش‌فرض</Badge>
+                <Badge Variant="secondary">ثانویه</Badge>
+                <Badge Variant="success">موفق</Badge>
+                <Badge Variant="warning">در انتظار</Badge>
+                <Badge Variant="destructive">لغو شده</Badge>
+                <Badge Variant="brand" Solid>جدید</Badge>
+            </div>
+            break;
+
+        case "avatar":
+            <div class="vf-row">
+                <Avatar Size="sm" Initials="س‌ا" Alt="سارا احمدی" />
+                <Avatar Initials="م‌ر" Alt="مهدی رضایی" />
+                <Avatar Size="lg" Initials="ز" Alt="زهرا" />
+            </div>
+            break;
+
+        case "table":
+            <Table Caption="سفارش‌های اخیر">
+                <thead>
+                    <tr><th>شماره</th><th>مشتری</th><th>مبلغ</th><th>وضعیت</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>@PersianText.Fa(1024)</td><td>سارا احمدی</td><td>@PersianText.FormatToman(2450000)</td><td><Badge Variant="success">پرداخت شد</Badge></td></tr>
+                    <tr><td>@PersianText.Fa(1023)</td><td>مهدی رضایی</td><td>@PersianText.FormatToman(890000)</td><td><Badge Variant="warning">در انتظار</Badge></td></tr>
+                    <tr><td>@PersianText.Fa(1022)</td><td>زهرا کریمی</td><td>@PersianText.FormatToman(4300000)</td><td><Badge Variant="secondary">ارسال شد</Badge></td></tr>
+                </tbody>
+            </Table>
+            break;
+
+        case "stat":
+            <div class="vf-demo-grid">
+                <Card><Stat Label="فروش امروز" Value="@PersianText.FormatToman(2450000)" Hint="+۱۲٪ نسبت به دیروز" /></Card>
+                <Card><Stat Label="سفارش‌های باز" Value="@PersianText.Fa(28)" Hint="۳ مورد نیازمند بررسی" /></Card>
+            </div>
+            break;
+
+        case "price":
+            <div class="vf-row">
+                <Price Amount="2450000" OldAmount="2900000" Size="lg" />
+                <Price Amount="0" Free />
+            </div>
+            break;
+
+        case "accordion":
+            <Accordion>
+                <AccordionItem Title="ارسال چقدر طول می‌کشد؟" InitiallyOpen="true">
+                    سفارش‌های تهران معمولاً ۲۴ ساعت کاری زمان می‌برند.
+                </AccordionItem>
+                <AccordionItem Title="امکان بازگشت کالا هست؟">
+                    تا ۷ روز پس از دریافت، در صورت سالم بودن بسته.
+                </AccordionItem>
+            </Accordion>
+            break;
+
+        case "kbd":
+            <div class="vf-row">
+                <Kbd>Ctrl</Kbd><span>+</span><Kbd>K</Kbd>
+                <span class="vf-muted">برای باز کردن جست‌وجو</span>
+            </div>
+            break;
+
+        case "card":
+            <Card Title="گزارش هفتگی" Description="خلاصه‌ی فروش هفت روز گذشته">
+                <p class="vf-muted">۳۲ سفارش، میانگین ۱٬۸۰۰٬۰۰۰ تومان.</p>
+                <div style="margin-top:.75rem"><Button Size="sm" Variant="outline">مشاهده گزارش</Button></div>
+            </Card>
+            break;
+
+        case "phone-input":
+            <PhoneInput @bind-Value="_phone" />
+            break;
+
+        case "national-id-input":
+            <NationalIdInput @bind-Value="_nationalId" />
+            break;
+
+        case "amount-input":
+            <AmountInput @bind-Value="_amount" />
+            break;
+
+        case "search-input":
+            <SearchInput @bind-Value="_search" Placeholder="جست‌وجوی محصول…" />
+            break;
+
+        case "separator":
+            <div class="vf-stack">
+                <Separator Label="یا" />
+                <Separator />
+            </div>
+            break;
+
+        case "spinner":
+            <div class="vf-row">
+                <Spinner Size="sm" /><Spinner /><Spinner Size="lg" />
+            </div>
+            break;
+
+        case "relative-time":
+            <div class="vf-stack vf-muted">
+                <RelativeTime Value="DateTime.Now.AddMinutes(-8)" />
+                <RelativeTime Value="DateTime.Now.AddHours(-5)" />
+                <RelativeTime Value="DateTime.Now.AddDays(-3)" />
+            </div>
+            break;
+
+        case "copy-button":
+            <CopyButton Text="dotnet add package VibeFarsiUI" Label="کپی دستور نصب" />
+            break;
+
+        case "date-picker":
+        case "calendar":
+            <JalaliDatePicker @bind-Value="_date" />
+            break;
+
+        default:
+            <Alert Variant="warning" Title="در حال مهاجرت">
+                پیش‌نمایش زنده‌ی این کامپوننت هنوز در Blazor پیاده‌سازی نشده است؛
+                متادیتا و سورس اصلی در همین صفحه در دسترس است.
+            </Alert>
+            break;
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired] public string Slug { get; set; } = string.Empty;
+
+    private string? _name = "سارا احمدی";
+    private string? _note = string.Empty;
+    private string? _city = "tehran";
+    private string _otp = string.Empty;
+    private int _count = 3;
+    private bool _terms;
+    private bool _newsletter = true;
+    private string? _plan = "standard";
+    private bool _switch = true;
+    private int _rating = 4;
+    private string _active = "account";
+    private int _page = 2;
+    private string? _phone = "09123456789";
+    private string? _nationalId = "0499370899";
+    private double _amount = 2450000;
+    private string? _search = string.Empty;
+    private DateTime? _date = DateTime.Today;
+
+    private readonly SelectOption[] _cities =
+    [
+        new("tehran", "تهران"),
+        new("isfahan", "اصفهان"),
+        new("mashhad", "مشهد"),
+        new("shiraz", "شیراز")
+    ];
+
+    private readonly RadioOption[] _plans =
+    [
+        new("basic", "پایه", "برای شروع"),
+        new("standard", "استاندارد", "پیشنهاد ما"),
+        new("pro", "حرفه‌ای", "برای تیم‌ها")
+    ];
+
+    private readonly TabItem[] _tabs =
+    [
+        new("account", "حساب"),
+        new("billing", "صورتحساب", "۳"),
+        new("security", "امنیت")
+    ];
+
+    private readonly BreadcrumbItem[] _crumbs =
+    [
+        new("خانه", "/"),
+        new("کامپوننت‌ها", "/components"),
+        new("مسیر فعلی")
+    ];
+}

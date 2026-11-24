@@ -1,0 +1,37 @@
+@* Ported from registry/ui/amount-input.tsx — Persian grouping, Toman unit, numeric binding. *@
+<div class="vf-field">
+    @if (!string.IsNullOrEmpty(Label))
+    {
+        <label class="vf-label" for="@Id">@Label</label>
+    }
+    <div class="vf-input-wrap">
+        <input id="@Id"
+               class="vf-input"
+               type="text"
+               inputmode="numeric"
+               value="@PersianText.FaNumber(Value)"
+               placeholder="۰"
+               aria-label="@(Label ?? "مبلغ")"
+               @oninput="OnInputAsync" />
+        <span class="vf-addon">@Unit</span>
+    </div>
+    @if (Value > 0)
+    {
+        <span class="vf-hint">@PersianText.FormatToman(Value)</span>
+    }
+</div>
+
+@code {
+    [Parameter] public double Value { get; set; }
+    [Parameter] public EventCallback<double> ValueChanged { get; set; }
+    [Parameter] public string? Label { get; set; } = "مبلغ";
+    [Parameter] public string Unit { get; set; } = "تومان";
+    [Parameter] public string? Id { get; set; } = $"vf-amount-{Guid.NewGuid():N}";
+
+    private async Task OnInputAsync(ChangeEventArgs args)
+    {
+        var digits = PersianText.En(args.Value?.ToString()).Where(char.IsDigit).ToArray();
+        Value = digits.Length == 0 ? 0 : double.Parse(new string(digits));
+        await ValueChanged.InvokeAsync(Value);
+    }
+}

@@ -1,0 +1,25 @@
+@* Ported from registry/ui/empty-state.tsx. *@
+<div class="vf-empty @Class" @attributes="AdditionalAttributes">
+    <LucideIcon Name="@Icon" Size="32" />
+    @if (!string.IsNullOrEmpty(Title))
+    {
+        <strong>@Title</strong>
+    }
+    @if (!string.IsNullOrEmpty(Description))
+    {
+        <p>@Description</p>
+    }
+    @if (ChildContent is not null)
+    {
+        <div style="margin-top:.5rem">@ChildContent</div>
+    }
+</div>
+
+@code {
+    [Parameter] public string Icon { get; set; } = "inbox";
+    [Parameter] public string? Title { get; set; }
+    [Parameter] public string? Description { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public string? Class { get; set; }
+    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object>? AdditionalAttributes { get; set; }
+}

@@ -1,0 +1,36 @@
+@page "/icons"
+
+<PageTitle>آیکون‌های Lucide — وایب‌فارسی</PageTitle>
+<HeadContent>
+    <meta name="description" content="آیکون‌های SVG درون‌خطی Lucide برای رابط‌های فارسی؛ بدون وابستگی به بسته‌ی جاوااسکریپت." />
+</HeadContent>
+
+<header class="doc-header" style="margin-bottom:1.5rem">
+    <div>
+        <span class="hero__eyebrow">@PersianText.Fa(LucideIcon.Names.Count) آیکون</span>
+        <h1>آیکون‌ها</h1>
+        <p>SVGهای درون‌خطی Lucide با رنگ ارثی؛ در RTL بدون آینه‌شدن ناخواسته.</p>
+    </div>
+</header>
+
+<div class="search-row">
+    <SearchInput @bind-Value="_query" Placeholder="جست‌وجوی نام آیکون (انگلیسی)…" />
+</div>
+
+<div class="icon-grid">
+    @foreach (var name in Filtered)
+    {
+        <div class="icon-cell">
+            <LucideIcon Name="@name" Size="22" />
+            <span>@name</span>
+        </div>
+    }
+</div>
+
+@code {
+    private string? _query;
+
+    private IReadOnlyList<string> Filtered => string.IsNullOrWhiteSpace(_query)
+        ? LucideIcon.Names
+        : LucideIcon.Names.Where(n => n.Contains(_query.Trim(), StringComparison.OrdinalIgnoreCase)).ToList();
+}

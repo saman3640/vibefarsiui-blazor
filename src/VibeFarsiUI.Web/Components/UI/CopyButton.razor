@@ -1,0 +1,37 @@
+@* Ported from components/registry/copy-button.tsx — clipboard with feedback. *@
+<button type="button" class="vf-copy @Class" @onclick="CopyAsync" aria-live="polite">
+    @if (_copied)
+    {
+        <LucideIcon Name="check" Size="13" /> <span>کپی شد</span>
+    }
+    else
+    {
+        <LucideIcon Name="copy" Size="13" /> <span>@Label</span>
+    }
+</button>
+
+@code {
+    [Inject] private IJSRuntime JS { get; set; } = default!;
+    [Parameter] public string Text { get; set; } = string.Empty;
+    [Parameter] public string Label { get; set; } = "کپی";
+    [Parameter] public string? Class { get; set; }
+
+    private bool _copied;
+
+    private async Task CopyAsync()
+    {
+        try
+        {
+            _copied = await JS.InvokeAsync<bool>("vfCopy", Text);
+        }
+        catch (JSDisconnectedException)
+        {
+            _copied = false;
+        }
+        if (!_copied) return;
+        StateHasChanged();
+        await Task.Delay(1600);
+        _copied = false;
+        StateHasChanged();
+    }
+}
